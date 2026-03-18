@@ -13,6 +13,9 @@ import '../widgets/active_models_card.dart';
 import '../widgets/recent_activity_card.dart';
 import '../widgets/system_perf_card.dart';
 
+import '../providers/dashboard_provider.dart';
+import '../../../shared/widgets/gradient_badge.dart';
+
 class DashboardScreen extends ConsumerWidget {
   const DashboardScreen({super.key});
 
@@ -92,18 +95,20 @@ class DashboardScreen extends ConsumerWidget {
 }
 
 // ── Header ────────────────────────────────────────────────────────────────────
-class _DashboardHeader extends StatelessWidget {
+class _DashboardHeader extends ConsumerWidget {
   final VoidCallback onRefresh;
   const _DashboardHeader({required this.onRefresh});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final user = ref.watch(userProfileProvider).value;
+    final name = user?.name.split(' ').first ?? 'User';
+
     return Padding(
       padding: const EdgeInsets.fromLTRB(20, 24, 20, 20),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // ← Expanded দিয়ে text wrap করা — overflow fix
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -112,10 +117,17 @@ class _DashboardHeader extends StatelessWidget {
                   fit: BoxFit.scaleDown,
                   alignment: Alignment.centerLeft,
                   child: Row(children: [
-                    Text('Good morning, John',
+                    Text('Good morning, $name',
                         style: AppTextStyles.displayMedium),
                     const SizedBox(width: 8),
                     const Text('👋', style: TextStyle(fontSize: 22)),
+                    if (user?.plan != 'free') ...[
+                      const SizedBox(width: 12),
+                      GradientBadge(
+                        label: user?.plan.toUpperCase() ?? 'PRO',
+                        gradient: AppColors.violetGradient,
+                      ),
+                    ],
                   ]),
                 ),
                 const SizedBox(height: 4),
@@ -133,7 +145,7 @@ class _DashboardHeader extends StatelessWidget {
             GlassCard(
               padding: const EdgeInsets.all(10),
               onTap: onRefresh,
-              child: const Icon(LucideIcons.refreshCw,
+              child: const Icon(LucideIcons.refreshCcw,
                   size: 16, color: AppColors.textSecondary),
             ),
             const SizedBox(width: 8),

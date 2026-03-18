@@ -47,9 +47,9 @@ class AppSidebarFull extends ConsumerWidget {
             child: Text('PLATFORM', style: AppTextStyles.labelSmall),
           ),
         ),
-        _Item(label: 'Dashboard',     icon: LucideIcons.layoutDashboard, index: 0, selected: selected, ref: ref),
+        _Item(label: 'Dashboard',     icon: LucideIcons.layout,          index: 0, selected: selected, ref: ref),
         _Item(label: 'AI Playground', icon: LucideIcons.bot,             index: 1, selected: selected, ref: ref),
-        _Item(label: 'Analytics',     icon: LucideIcons.barChart2,       index: 2, selected: selected, ref: ref),
+        _Item(label: 'Analytics',     icon: LucideIcons.barChart,        index: 2, selected: selected, ref: ref),
         _Item(label: 'API Keys',      icon: LucideIcons.key,             index: 3, selected: selected, ref: ref),
         _Item(label: 'Notifications', icon: LucideIcons.bell,            index: 4, selected: selected, ref: ref, badge: '3'),
         _Item(label: 'Pricing',       icon: LucideIcons.creditCard,      index: 5, selected: selected, ref: ref),
@@ -64,7 +64,7 @@ class AppSidebarFull extends ConsumerWidget {
             child: Text('ACCOUNT', style: AppTextStyles.labelSmall),
           ),
         ),
-        _Item(label: 'Settings', icon: LucideIcons.settings2, index: 6, selected: selected, ref: ref),
+        _Item(label: 'Settings', icon: LucideIcons.settings, index: 6, selected: selected, ref: ref),
 
         // User card
         Container(

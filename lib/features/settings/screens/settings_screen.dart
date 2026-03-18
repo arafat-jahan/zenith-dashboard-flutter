@@ -185,22 +185,21 @@ class _NotificationsCard extends StatelessWidget {
         const SizedBox(height: 4),
         Text('Choose how you want to be notified', style: AppTextStyles.bodySmall),
         const SizedBox(height: 20),
-        _ToggleRow(ref: ref, provider: _notifEmailProvider, icon: LucideIcons.mail, title: 'Email Alerts', subtitle: 'Usage limits & billing'),
+        _ToggleRow(provider: _notifEmailProvider, icon: LucideIcons.mail, title: 'Email Alerts', subtitle: 'Usage limits & billing'),
         const Divider(color: AppColors.glassBorder, height: 20),
-        _ToggleRow(ref: ref, provider: _notifSlackProvider, icon: LucideIcons.slack, title: 'Slack Integration', subtitle: 'Real-time incident alerts'),
+        _ToggleRow(provider: _notifSlackProvider, icon: LucideIcons.hash, title: 'Slack Integration', subtitle: 'Real-time incident alerts'),
         const Divider(color: AppColors.glassBorder, height: 20),
-        _ToggleRow(ref: ref, provider: _notifSmsProvider, icon: LucideIcons.messageSquare, title: 'SMS Alerts', subtitle: 'Critical system events only'),
+        _ToggleRow(provider: _notifSmsProvider, icon: LucideIcons.messageSquare, title: 'SMS Alerts', subtitle: 'Critical system events only'),
       ]),
     );
   }
 }
 
 class _ToggleRow extends ConsumerWidget {
-  final WidgetRef ref;
   final StateProvider<bool> provider;
   final IconData icon;
   final String title, subtitle;
-  const _ToggleRow({required this.ref, required this.provider, required this.icon, required this.title, required this.subtitle});
+  const _ToggleRow({required this.provider, required this.icon, required this.title, required this.subtitle});
 
   @override
   Widget build(BuildContext context, WidgetRef r) {

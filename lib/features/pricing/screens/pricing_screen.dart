@@ -7,6 +7,7 @@ import '../../../core/theme/app_text_styles.dart';
 import '../../../core/providers/app_providers.dart';
 import '../../../shared/widgets/glass_card.dart';
 import '../../../shared/widgets/gradient_badge.dart';
+import '../../../core/services/stripe_mock_service.dart';
 
 class _Plan {
   final String id, name, tagline, cta;
@@ -166,14 +167,15 @@ class _ToggleBtn extends StatelessWidget {
   }
 }
 
-class _PlanCard extends StatelessWidget {
+class _PlanCard extends ConsumerWidget {
   final _Plan plan; final String billing; final bool isSelected; final VoidCallback onSelect;
   const _PlanCard({required this.plan, required this.billing, required this.isSelected, required this.onSelect});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final price = billing == 'annual' ? plan.annualPrice : plan.monthlyPrice;
     final isFree = price == 0;
+    final user = ref.watch(authStateProvider).value;
 
     return GlassCard(
       glowColor: isSelected ? plan.glowColor : Colors.transparent,
@@ -217,7 +219,24 @@ class _PlanCard extends StatelessWidget {
               boxShadow: plan.isPopular ? [BoxShadow(color: plan.glowColor, blurRadius: 24, spreadRadius: -4)] : null,
             ),
             child: Material(color: Colors.transparent,
-                child: InkWell(onTap: () {}, borderRadius: BorderRadius.circular(10),
+                child: InkWell(
+                  onTap: () async {
+                    if (user != null) {
+                      final stripe = StripeMockService(uid: user.uid);
+                      final success = await stripe.subscribeToPlan(plan.id);
+                      if (success) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(content: Text('Successfully subscribed to ${plan.name}!')),
+                        );
+                        ref.invalidate(userProfileProvider);
+                      }
+                    } else {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(content: Text('Please login to subscribe')),
+                      );
+                    }
+                  }, 
+                  borderRadius: BorderRadius.circular(10),
                     child: Padding(padding: const EdgeInsets.symmetric(vertical: 13),
                         child: Text(plan.cta, textAlign: TextAlign.center,
                             style: AppTextStyles.labelLarge.copyWith(

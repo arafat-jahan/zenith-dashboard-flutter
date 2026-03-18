@@ -7,6 +7,9 @@ import '../../../core/theme/app_text_styles.dart';
 import '../../../core/providers/app_providers.dart';
 import '../../../shared/widgets/glass_card.dart';
 
+import '../providers/chat_provider.dart';
+import '../models/chat_message.dart';
+
 class ChatScreen extends ConsumerStatefulWidget {
   const ChatScreen({super.key});
   @override
@@ -212,7 +215,7 @@ class _MessageBubble extends StatelessWidget {
                     : null,
               ),
               child: Text(
-                message.content,
+                message.text,
                 style: AppTextStyles.bodyMedium.copyWith(
                   color: isUser ? Colors.white : AppColors.textPrimary,
                   height: 1.6,

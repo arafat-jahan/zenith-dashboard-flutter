@@ -27,7 +27,7 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
     _Notif(title: 'Usage Alert: 80% of token quota', body: 'You have used 8B of your 10B monthly token limit. Consider upgrading.', time: '5 min ago', category: 'Billing', icon: LucideIcons.alertTriangle, color: AppColors.accentAmber),
     _Notif(title: 'New model: Zenith Ultra v3', body: 'Zenith Ultra v3 is now available with 40% faster inference and improved reasoning.', time: '1 hour ago', category: 'Updates', icon: LucideIcons.sparkles, color: AppColors.accentViolet),
     _Notif(title: 'API latency spike detected', body: 'US-East region experiencing elevated latency (avg 340ms). Engineers are investigating.', time: '3 hours ago', category: 'Incidents', icon: LucideIcons.alertCircle, color: AppColors.accentRose),
-    _Notif(title: 'Fine-tune job completed', body: 'Your custom model "product-v2" has finished training. Accuracy: 97.3%.', time: '6 hours ago', category: 'Updates', icon: LucideIcons.checkCircle2, color: AppColors.accentGreen, isRead: true),
+    _Notif(title: 'Fine-tune job completed', body: 'Your custom model "product-v2" has finished training. Accuracy: 97.3%.', time: '6 hours ago', category: 'Updates', icon: LucideIcons.checkCircle, color: AppColors.accentGreen, isRead: true),
     _Notif(title: 'Invoice generated: March 2025', body: 'Your monthly invoice of \$49.00 has been generated and will be charged on Apr 1.', time: '1 day ago', category: 'Billing', icon: LucideIcons.creditCard, color: AppColors.accentBlue, isRead: true),
     _Notif(title: 'New team member added', body: 'Sarah Chen has joined your workspace as Developer.', time: '2 days ago', category: 'Team', icon: LucideIcons.userPlus, color: AppColors.accentCyan, isRead: true),
     _Notif(title: 'Scheduled maintenance', body: 'Planned maintenance window on Apr 5, 2:00-4:00 AM UTC. Brief downtime expected.', time: '3 days ago', category: 'Incidents', icon: LucideIcons.wrench, color: AppColors.accentAmber, isRead: true),
@@ -72,7 +72,7 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
                     padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
                     onTap: () {},
                     child: Row(children: [
-                      const Icon(LucideIcons.checkCheck, size: 14, color: AppColors.accentViolet),
+                      const Icon(LucideIcons.check, size: 14, color: AppColors.accentViolet),
                       const SizedBox(width: 6),
                       Text('Mark all read', style: AppTextStyles.labelLarge.copyWith(color: AppColors.accentViolet)),
                     ]),

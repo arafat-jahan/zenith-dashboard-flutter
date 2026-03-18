@@ -7,6 +7,9 @@ import '../../../core/theme/app_text_styles.dart';
 import '../../../shared/widgets/glass_card.dart';
 import '../../../shared/widgets/gradient_badge.dart';
 
+import '../../../core/providers/app_providers.dart';
+import '../../../app_shell.dart';
+
 class LoginScreen extends ConsumerStatefulWidget {
   const LoginScreen({super.key});
   @override
@@ -27,9 +30,39 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
   }
 
   Future<void> _login() async {
+    if (_emailCtrl.text.isEmpty || _passCtrl.text.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Please fill in all fields')),
+      );
+      return;
+    }
+
     setState(() => _loading = true);
-    await Future.delayed(const Duration(milliseconds: 1500));
-    setState(() => _loading = false);
+    try {
+      final authService = ref.read(authServiceProvider);
+      // Try to login, if fails with user-not-found, try to register for demo purposes
+      try {
+        await authService.login(_emailCtrl.text, _passCtrl.text);
+      } catch (e) {
+        // If it's a new user for this demo, let's register them automatically
+        // In a real app, you'd have a separate registration screen
+        await authService.register(_emailCtrl.text, _passCtrl.text, 'Demo User');
+      }
+      
+      if (mounted) {
+        Navigator.of(context).pushReplacement(
+          MaterialPageRoute(builder: (_) => const AppShell()),
+        );
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Error: ${e.toString()}')),
+        );
+      }
+    } finally {
+      if (mounted) setState(() => _loading = false);
+    }
   }
 
   @override
