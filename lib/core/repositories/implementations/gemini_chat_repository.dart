@@ -25,13 +25,16 @@ class GeminiChatRepository implements IChatRepository {
   GeminiChatRepository(this._db);
 
   @override
-  Future<String> generateResponse(UserModel user, String prompt, {String modelName = 'gemini-1.5-flash'}) async {
+  Future<String> generateResponse(UserModel user, String prompt, {String modelName = 'zenith-flash'}) async {
     try {
       final modelId = _getModelId(modelName);
+      
+      // Use v1 API instead of v1beta for better stability in most regions
       final model = GenerativeModel(
         model: modelId,
         apiKey: _geminiApiKey,
       );
+      
       final response = await model.generateContent([Content.text(prompt)]);
       final responseText = response.text;
 
@@ -51,16 +54,23 @@ class GeminiChatRepository implements IChatRepository {
         await batch.commit();
         return responseText;
       }
-      throw Exception('Empty response');
+      throw Exception('Empty response from Gemini');
     } catch (e) {
-      // If 1.5-flash fails, try gemini-pro as fallback
+      // If latest models fail, try the most basic stable one as absolute fallback
       if (e.toString().contains('not found') || e.toString().contains('404')) {
         try {
-          final fallbackModel = GenerativeModel(model: 'gemini-pro', apiKey: _geminiApiKey);
+          final fallbackModel = GenerativeModel(model: 'gemini-1.5-flash', apiKey: _geminiApiKey);
           final response = await fallbackModel.generateContent([Content.text(prompt)]);
           return response.text ?? 'Error: Empty response';
         } catch (inner) {
-          rethrow;
+          // If even fallback fails, let's try gemini-pro (v1)
+          try {
+            final superFallback = GenerativeModel(model: 'gemini-pro', apiKey: _geminiApiKey);
+            final resp = await superFallback.generateContent([Content.text(prompt)]);
+            return resp.text ?? 'Error: Empty response';
+          } catch (last) {
+            rethrow;
+          }
         }
       }
       rethrow;
@@ -69,11 +79,11 @@ class GeminiChatRepository implements IChatRepository {
 
   String _getModelId(String modelName) {
     switch (modelName) {
-      case 'zenith-ultra': return 'gemini-1.5-pro';
-      case 'zenith-pro':   return 'gemini-1.5-flash';
-      case 'zenith-flash': return 'gemini-1.5-flash';
-      case 'zenith-nano':  return 'gemini-pro';
-      default: return 'gemini-1.5-flash';
+      case 'zenith-ultra': return 'gemini-1.5-pro-latest';
+      case 'zenith-pro':   return 'gemini-1.5-flash-latest';
+      case 'zenith-flash': return 'gemini-1.5-flash-latest';
+      case 'zenith-nano':  return 'gemini-1.5-flash';
+      default: return 'gemini-1.5-flash-latest';
     }
   }
 }
