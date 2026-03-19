@@ -35,7 +35,7 @@ class ChatNotifier extends StateNotifier<ChatState> {
       final user = ref.read(authStateChangesProvider).value;
       
       if (user != null) {
-        final response = await chatRepo.generateResponse(user, text);
+        final response = await chatRepo.generateResponse(user, text, modelName: state.selectedModel);
         final aiMessage = ChatMessage(
           text: response,
           isUser: false,
