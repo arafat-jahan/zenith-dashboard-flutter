@@ -7,7 +7,7 @@ import '../../../core/theme/app_text_styles.dart';
 import '../../../shared/widgets/glass_card.dart';
 import '../../../shared/widgets/gradient_badge.dart';
 
-import '../../../core/providers/app_providers.dart';
+import '../providers/auth_provider.dart';
 import '../../../app_shell.dart';
 
 class LoginScreen extends ConsumerStatefulWidget {
@@ -39,14 +39,13 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
 
     setState(() => _loading = true);
     try {
-      final authService = ref.read(authServiceProvider);
+      final authRepo = ref.read(authRepositoryProvider);
       // Try to login, if fails with user-not-found, try to register for demo purposes
       try {
-        await authService.login(_emailCtrl.text, _passCtrl.text);
+        await authRepo.login(_emailCtrl.text, _passCtrl.text);
       } catch (e) {
         // If it's a new user for this demo, let's register them automatically
-        // In a real app, you'd have a separate registration screen
-        await authService.register(_emailCtrl.text, _passCtrl.text, 'Demo User');
+        await authRepo.register(_emailCtrl.text, _passCtrl.text, 'Demo User');
       }
       
       if (mounted) {
@@ -91,7 +90,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                         width: 400, height: 400,
                         decoration: BoxDecoration(
                           shape: BoxShape.circle,
-                          color: AppColors.accentViolet.withOpacity(0.15),
+                          color: AppColors.accentViolet.withValues(alpha: 0.15),
                         ),
                       ),
                     ),
@@ -101,7 +100,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                         width: 300, height: 300,
                         decoration: BoxDecoration(
                           shape: BoxShape.circle,
-                          color: AppColors.accentBlue.withOpacity(0.12),
+                          color: AppColors.accentBlue.withValues(alpha: 0.12),
                         ),
                       ),
                     ),

@@ -1,7 +1,13 @@
-// lib/features/chat/providers/chat_provider.dart
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import '../../../core/repositories/implementations/gemini_chat_repository.dart';
+import '../../../core/repositories/interfaces/i_chat_repository.dart';
+import '../../auth/providers/auth_provider.dart';
 import '../models/chat_message.dart';
-import '../../../core/providers/app_providers.dart';
+
+final chatRepositoryProvider = Provider<IChatRepository>((ref) {
+  return GeminiChatRepository(FirebaseFirestore.instance);
+});
 
 class ChatNotifier extends StateNotifier<ChatState> {
   final Ref ref;
@@ -12,7 +18,7 @@ class ChatNotifier extends StateNotifier<ChatState> {
     selectedModel: 'zenith-ultra',
   ));
 
-  void sendMessage(String text) async {
+  Future<void> sendMessage(String text) async {
     final userMessage = ChatMessage(
       text: text,
       isUser: true,
@@ -25,24 +31,20 @@ class ChatNotifier extends StateNotifier<ChatState> {
     );
 
     try {
-      final geminiService = ref.read(geminiServiceProvider);
-      final user = ref.read(authStateProvider).value;
+      final chatRepo = ref.read(chatRepositoryProvider);
+      final user = ref.read(authStateChangesProvider).value;
       
       if (user != null) {
-        final response = await geminiService.generateResponse(text, user.uid);
-        if (response != null) {
-          final aiMessage = ChatMessage(
-            text: response,
-            isUser: false,
-            timestamp: DateTime.now(),
-          );
-          state = state.copyWith(
-            messages: [...state.messages, aiMessage],
-            isTyping: false,
-          );
-        } else {
-          _addErrorMessage('Failed to generate response');
-        }
+        final response = await chatRepo.generateResponse(user, text);
+        final aiMessage = ChatMessage(
+          text: response,
+          isUser: false,
+          timestamp: DateTime.now(),
+        );
+        state = state.copyWith(
+          messages: [...state.messages, aiMessage],
+          isTyping: false,
+        );
       } else {
         _addErrorMessage('User not authenticated');
       }

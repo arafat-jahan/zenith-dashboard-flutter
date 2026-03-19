@@ -4,19 +4,19 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_text_styles.dart';
-import '../../../core/providers/app_providers.dart';
 import '../../../shared/widgets/glass_card.dart';
 import '../../../shared/widgets/gradient_badge.dart';
-import '../../../core/services/stripe_mock_service.dart';
+import '../providers/pricing_provider.dart';
+import '../../auth/providers/auth_provider.dart';
 
-class _Plan {
+class PricingPlan {
   final String id, name, tagline, cta;
   final double monthlyPrice, annualPrice;
   final List<String> features, limits;
   final Gradient gradient;
   final Color glowColor;
   final bool isPopular;
-  const _Plan({required this.id, required this.name, required this.tagline,
+  const PricingPlan({required this.id, required this.name, required this.tagline,
     required this.monthlyPrice, required this.annualPrice, required this.features,
     required this.limits, required this.gradient, required this.glowColor,
     this.isPopular = false, required this.cta});
@@ -25,33 +25,43 @@ class _Plan {
 class PricingScreen extends ConsumerWidget {
   const PricingScreen({super.key});
 
-  static const List<_Plan> _plans = [
-    _Plan(
-      id: 'starter', name: 'Starter', tagline: 'For solo builders & experimentation',
-      monthlyPrice: 0, annualPrice: 0, cta: 'Get Started Free',
-      features: ['100K tokens / month','Zenith Nano & Flash','Community support','REST API access','Basic analytics'],
-      limits: ['No fine-tuning','No SLA guarantee','Rate limited 10 req/s'],
-      gradient: LinearGradient(colors: [Color(0xFF1E1E2E), Color(0xFF2A2A3E)]),
-      glowColor: Color(0x2294A3B8),
-    ),
-    _Plan(
-      id: 'pro', name: 'Pro', tagline: 'For growing startups & teams',
-      monthlyPrice: 59, annualPrice: 49, isPopular: true, cta: 'Start Pro Trial',
-      features: ['10B tokens / month','All models incl. Ultra','Priority support < 4h',
-        'Advanced analytics','Fine-tuning (3 models)','99.9% uptime SLA','Webhooks & streaming','10 team seats'],
-      limits: [],
-      gradient: AppColors.violetGradient,
-      glowColor: AppColors.glowViolet,
-    ),
-    _Plan(
-      id: 'enterprise', name: 'Enterprise', tagline: 'For scaling companies & platforms',
-      monthlyPrice: 299, annualPrice: 249, cta: 'Contact Sales',
-      features: ['Unlimited tokens','All + custom models','Dedicated support engineer',
-        'Custom SLA up to 99.99%','Unlimited fine-tuning','Private cloud deploy',
-        'SSO / SAML / SCIM','Audit logs & compliance','Unlimited seats'],
+  static const List<PricingPlan> _plans = [
+    PricingPlan(
+      id: 'starter',
+      name: 'Starter',
+      tagline: 'Perfect for side projects',
+      monthlyPrice: 0,
+      annualPrice: 0,
+      cta: 'Get Started',
+      features: ['1,000 API calls/mo', 'Standard support', 'Community access', 'Basic analytics'],
       limits: [],
       gradient: AppColors.blueGradient,
       glowColor: AppColors.glowBlue,
+    ),
+    PricingPlan(
+      id: 'pro',
+      name: 'Pro',
+      tagline: 'For scaling applications',
+      monthlyPrice: 49,
+      annualPrice: 39,
+      cta: 'Start Pro Trial',
+      features: ['100,000 API calls/mo', 'Priority 24/7 support', 'Custom models', 'Advanced analytics', 'Team collaboration'],
+      limits: [],
+      gradient: AppColors.violetGradient,
+      glowColor: AppColors.glowViolet,
+      isPopular: true,
+    ),
+    PricingPlan(
+      id: 'enterprise',
+      name: 'Enterprise',
+      tagline: 'Custom solutions for teams',
+      monthlyPrice: 199,
+      annualPrice: 159,
+      cta: 'Contact Sales',
+      features: ['Unlimited API calls', 'Dedicated account manager', 'SLA guarantee', 'Custom integrations', 'On-premise deployment'],
+      limits: [],
+      gradient: AppColors.greenGradient,
+      glowColor: AppColors.glowGreen,
     ),
   ];
 
@@ -152,7 +162,7 @@ class _ToggleBtn extends StatelessWidget {
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
               decoration: BoxDecoration(
-                color: isSelected ? Colors.white.withOpacity(0.2) : AppColors.accentGreen.withOpacity(0.15),
+                color: isSelected ? Colors.white.withValues(alpha: 0.2) : AppColors.accentGreen.withValues(alpha: 0.15),
                 borderRadius: BorderRadius.circular(4),
               ),
               child: Text(badge!, style: TextStyle(
@@ -168,30 +178,45 @@ class _ToggleBtn extends StatelessWidget {
 }
 
 class _PlanCard extends ConsumerWidget {
-  final _Plan plan; final String billing; final bool isSelected; final VoidCallback onSelect;
-  const _PlanCard({required this.plan, required this.billing, required this.isSelected, required this.onSelect});
+  final PricingPlan plan;
+  final String billing;
+  final bool isSelected;
+  final VoidCallback onSelect;
+
+  const _PlanCard({
+    required this.plan,
+    required this.billing,
+    required this.isSelected,
+    required this.onSelect,
+  });
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final price = billing == 'annual' ? plan.annualPrice : plan.monthlyPrice;
     final isFree = price == 0;
-    final user = ref.watch(authStateProvider).value;
+    final user = ref.watch(userProfileProvider).value;
+    final subState = ref.watch(subscriptionProvider);
 
     return GlassCard(
       glowColor: isSelected ? plan.glowColor : Colors.transparent,
       glowRadius: 32,
-      borderColor: isSelected ? plan.gradient.colors.first.withOpacity(0.5) : AppColors.glassBorder,
+      borderColor: isSelected ? plan.gradient.colors.first.withValues(alpha: 0.5) : AppColors.glassBorder,
       padding: const EdgeInsets.all(24),
       onTap: onSelect,
       child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
         if (plan.isPopular)
-          Padding(padding: const EdgeInsets.only(bottom: 12),
-              child: GradientBadge(label: '⚡  Most Popular', gradient: plan.gradient)),
+          Padding(
+            padding: const EdgeInsets.only(bottom: 12),
+            child: GradientBadge(label: '⚡  Most Popular', gradient: plan.gradient),
+          ),
         Row(children: [
           Container(
             padding: const EdgeInsets.all(8),
-            decoration: BoxDecoration(gradient: plan.gradient, borderRadius: BorderRadius.circular(8),
-                boxShadow: [BoxShadow(color: plan.glowColor, blurRadius: 14)]),
+            decoration: BoxDecoration(
+              gradient: plan.gradient,
+              borderRadius: BorderRadius.circular(8),
+              boxShadow: [BoxShadow(color: plan.glowColor, blurRadius: 14)],
+            ),
             child: const Icon(LucideIcons.zap, size: 14, color: Colors.white),
           ),
           const SizedBox(width: 10),
@@ -203,8 +228,10 @@ class _PlanCard extends ConsumerWidget {
         Row(crossAxisAlignment: CrossAxisAlignment.end, children: [
           Text(isFree ? 'Free' : '\$${price.toInt()}', style: AppTextStyles.metricHuge.copyWith(fontSize: 38)),
           if (!isFree)
-            Padding(padding: const EdgeInsets.only(bottom: 6),
-                child: Text('/mo', style: AppTextStyles.bodyMedium)),
+            Padding(
+              padding: const EdgeInsets.only(bottom: 6),
+              child: Text('/mo', style: AppTextStyles.bodyMedium),
+            ),
         ]),
         if (!isFree && billing == 'annual')
           Text('Billed annually — \$${(price * 12).toInt()}/yr', style: AppTextStyles.bodySmall),
@@ -218,30 +245,36 @@ class _PlanCard extends ConsumerWidget {
               borderRadius: BorderRadius.circular(10),
               boxShadow: plan.isPopular ? [BoxShadow(color: plan.glowColor, blurRadius: 24, spreadRadius: -4)] : null,
             ),
-            child: Material(color: Colors.transparent,
-                child: InkWell(
-                  onTap: () async {
-                    if (user != null) {
-                      final stripe = StripeMockService(uid: user.uid);
-                      final success = await stripe.subscribeToPlan(plan.id);
-                      if (success) {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(content: Text('Successfully subscribed to ${plan.name}!')),
-                        );
-                        ref.invalidate(userProfileProvider);
-                      }
-                    } else {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(content: Text('Please login to subscribe')),
-                      );
-                    }
-                  }, 
-                  borderRadius: BorderRadius.circular(10),
-                    child: Padding(padding: const EdgeInsets.symmetric(vertical: 13),
-                        child: Text(plan.cta, textAlign: TextAlign.center,
-                            style: AppTextStyles.labelLarge.copyWith(
-                                color: plan.isPopular ? Colors.white : AppColors.textSecondary,
-                                fontWeight: FontWeight.w600))))),
+            child: Material(
+              color: Colors.transparent,
+              child: InkWell(
+                onTap: subState.isLoading
+                    ? null
+                    : () {
+                        if (user != null) {
+                          ref.read(subscriptionProvider.notifier).requestSubscription(plan.id);
+                        } else {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(content: Text('Please login to subscribe')),
+                          );
+                        }
+                      },
+                borderRadius: BorderRadius.circular(10),
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 13),
+                  child: subState.isLoading
+                      ? const Center(child: SizedBox(width: 20, height: 20, child: CircularProgressIndicator(strokeWidth: 2)))
+                      : Text(
+                          plan.cta,
+                          textAlign: TextAlign.center,
+                          style: AppTextStyles.labelLarge.copyWith(
+                            color: plan.isPopular ? Colors.white : AppColors.textSecondary,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                ),
+              ),
+            ),
           ),
         ),
         const Padding(padding: EdgeInsets.symmetric(vertical: 20), child: Divider(color: AppColors.glassBorder, height: 1)),

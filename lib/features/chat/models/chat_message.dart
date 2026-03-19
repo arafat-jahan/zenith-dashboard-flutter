@@ -1,36 +1,26 @@
-// lib/features/chat/models/chat_message.dart
-class ChatMessage {
-  final String text;
-  final bool isUser;
-  final DateTime timestamp;
+import 'package:freezed_annotation/freezed_annotation.dart';
 
-  ChatMessage({
-    required this.text,
-    required this.isUser,
-    required this.timestamp,
-  });
+part 'chat_message.freezed.dart';
+part 'chat_message.g.dart';
+
+@freezed
+class ChatMessage with _$ChatMessage {
+  const factory ChatMessage({
+    required String text,
+    required bool isUser,
+    required DateTime timestamp,
+  }) = _ChatMessage;
+
+  factory ChatMessage.fromJson(Map<String, dynamic> json) => _$ChatMessageFromJson(json);
 }
 
-class ChatState {
-  final List<ChatMessage> messages;
-  final bool isTyping;
-  final String selectedModel;
+@freezed
+class ChatState with _$ChatState {
+  const factory ChatState({
+    @Default([]) List<ChatMessage> messages,
+    @Default(false) bool isTyping,
+    @Default('zenith-ultra') String selectedModel,
+  }) = _ChatState;
 
-  ChatState({
-    required this.messages,
-    required this.isTyping,
-    required this.selectedModel,
-  });
-
-  ChatState copyWith({
-    List<ChatMessage>? messages,
-    bool? isTyping,
-    String? selectedModel,
-  }) {
-    return ChatState(
-      messages: messages ?? this.messages,
-      isTyping: isTyping ?? this.isTyping,
-      selectedModel: selectedModel ?? this.selectedModel,
-    );
-  }
+  factory ChatState.fromJson(Map<String, dynamic> json) => _$ChatStateFromJson(json);
 }

@@ -43,8 +43,8 @@ class GlassCard extends StatelessWidget {
           gradient: gradient ??
               LinearGradient(
                 colors: [
-                  AppColors.bgGlass.withOpacity(0.92),
-                  AppColors.bgSurface.withOpacity(0.88),
+                  AppColors.bgGlass.withValues(alpha: 0.92),
+                  AppColors.bgSurface.withValues(alpha: 0.88),
                 ],
                 begin: Alignment.topLeft,
                 end: Alignment.bottomRight,
@@ -71,8 +71,8 @@ class GlassCard extends StatelessWidget {
               gradient: gradient ??
                   LinearGradient(
                     colors: [
-                      AppColors.bgGlass.withOpacity(0.7),
-                      AppColors.bgSurface.withOpacity(0.5),
+                      AppColors.bgGlass.withValues(alpha: 0.7),
+                      AppColors.bgSurface.withValues(alpha: 0.5),
                     ],
                     begin: Alignment.topLeft,
                     end: Alignment.bottomRight,
@@ -99,7 +99,7 @@ class GlassCard extends StatelessWidget {
           borderRadius: BorderRadius.circular(borderRadius),
           boxShadow: [
             BoxShadow(
-              color: glowColor!.withOpacity(0.2), // opacity কমালাম
+              color: glowColor!.withValues(alpha: 0.2), // opacity কমালাম
               blurRadius: glowRadius * 0.7,        // radius কমালাম
               spreadRadius: -6,
             ),

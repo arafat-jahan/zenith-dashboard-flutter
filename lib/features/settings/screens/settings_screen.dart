@@ -10,8 +10,6 @@ import '../../../shared/widgets/gradient_badge.dart';
 final _notifEmailProvider = StateProvider<bool>((ref) => true);
 final _notifSlackProvider = StateProvider<bool>((ref) => false);
 final _notifSmsProvider = StateProvider<bool>((ref) => true);
-final _2faProvider = StateProvider<bool>((ref) => true);
-final _darkModeProvider = StateProvider<bool>((ref) => true);
 
 class SettingsScreen extends ConsumerWidget {
   const SettingsScreen({super.key});
@@ -152,7 +150,7 @@ class _SecurityItem extends StatelessWidget {
       Container(
         padding: const EdgeInsets.all(8),
         decoration: BoxDecoration(
-          color: AppColors.accentViolet.withOpacity(0.1),
+          color: AppColors.accentViolet.withValues(alpha: 0.1),
           borderRadius: BorderRadius.circular(8),
         ),
         child: Icon(icon, size: 15, color: AppColors.accentViolet),
@@ -218,8 +216,8 @@ class _ToggleRow extends ConsumerWidget {
       Switch(
         value: val,
         onChanged: (v) => r.read(provider.notifier).state = v,
-        activeColor: AppColors.accentViolet,
-        activeTrackColor: AppColors.accentViolet.withOpacity(0.3),
+        activeThumbColor: AppColors.accentViolet,
+        activeTrackColor: AppColors.accentViolet.withValues(alpha: 0.3),
         inactiveTrackColor: AppColors.bgElevated,
         inactiveThumbColor: AppColors.textMuted,
       ),
@@ -251,8 +249,8 @@ class _DangerZoneCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return GlassCard(
-      borderColor: AppColors.accentRose.withOpacity(0.3),
-      glowColor: AppColors.accentRose.withOpacity(0.1),
+      borderColor: AppColors.accentRose.withValues(alpha: 0.3),
+      glowColor: AppColors.accentRose.withValues(alpha: 0.1),
       glowRadius: 20,
       child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
         Row(children: [
@@ -268,7 +266,7 @@ class _DangerZoneCard extends StatelessWidget {
           ])),
           Container(
             decoration: BoxDecoration(
-              border: Border.all(color: AppColors.accentRose.withOpacity(0.5)),
+              border: Border.all(color: AppColors.accentRose.withValues(alpha: 0.5)),
               borderRadius: BorderRadius.circular(8),
             ),
             child: Material(color: Colors.transparent,

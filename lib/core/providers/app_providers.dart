@@ -25,8 +25,8 @@ final userProfileProvider = FutureProvider<UserModel?>((ref) async {
 
 // Gemini Service Provider
 final geminiServiceProvider = Provider<GeminiService>((ref) {
-  // Your real Gemini API key
-  const apiKey = 'AIzaSyA8p1pTNjSqj1chw4dnaojbQRoj6VAZEKQ'; 
+  // Use String.fromEnvironment for better security
+  const apiKey = String.fromEnvironment('GEMINI_API_KEY', defaultValue: 'AIzaSyA8p1pTNjSqj1chw4dnaojbQRoj6VAZEKQ');
   return GeminiService(apiKey: apiKey);
 });
 

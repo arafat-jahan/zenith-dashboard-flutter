@@ -4,7 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 import '../../core/theme/app_colors.dart';
 import '../../core/theme/app_text_styles.dart';
-import '../../core/providers/app_providers.dart';
+import '../../core/providers/nav_provider.dart';
 
 class AppSidebarFull extends ConsumerWidget {
   const AppSidebarFull({super.key});
@@ -131,9 +131,9 @@ class _Item extends StatelessWidget {
           duration: const Duration(milliseconds: 200),
           padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
           decoration: BoxDecoration(
-            color: isSel ? AppColors.accentViolet.withOpacity(0.12) : Colors.transparent,
+            color: isSel ? AppColors.accentViolet.withValues(alpha: 0.12) : Colors.transparent,
             borderRadius: BorderRadius.circular(10),
-            border: isSel ? Border.all(color: AppColors.accentViolet.withOpacity(0.3)) : null,
+            border: isSel ? Border.all(color: AppColors.accentViolet.withValues(alpha: 0.3)) : null,
           ),
           child: Row(children: [
             Icon(icon, size: 16,
@@ -161,3 +161,4 @@ class _Item extends StatelessWidget {
     );
   }
 }
+

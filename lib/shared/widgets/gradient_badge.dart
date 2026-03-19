@@ -31,7 +31,7 @@ class StatusDot extends StatelessWidget {
       width: 8, height: 8,
       decoration: BoxDecoration(
         color: color, shape: BoxShape.circle,
-        boxShadow: [BoxShadow(color: color.withOpacity(0.6), blurRadius: 6, spreadRadius: 1)],
+        boxShadow: [BoxShadow(color: color.withValues(alpha: 0.6), blurRadius: 6, spreadRadius: 1)],
       ),
     );
   }
