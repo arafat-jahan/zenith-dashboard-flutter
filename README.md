@@ -1,4 +1,4 @@
-# 🚀 Zenith AI - Premium Flutter SaaS Dashboard Kit
+# 🚀 Zenith AI - Premium Flutter Dashboard Kit
 
 [![Flutter](https://img.shields.io/badge/Flutter-3.24+-02569B?logo=flutter&logoColor=white)](https://flutter.dev)
 [![Riverpod](https://img.shields.io/badge/Riverpod-2.0-764ABC?logo=riverpod&logoColor=white)](https://riverpod.dev)
