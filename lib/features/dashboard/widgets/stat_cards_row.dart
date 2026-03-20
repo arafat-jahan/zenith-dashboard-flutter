@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 import '../../../core/theme/app_colors.dart';
 import '../providers/dashboard_provider.dart';
 import 'stat_bento_card.dart';
 
-class StatCardsRow extends StatelessWidget {
-  final DashboardStats stats;
-  const StatCardsRow({super.key, required this.stats});
+class StatCardsRow extends ConsumerWidget {
+  const StatCardsRow({super.key});
 
   String _fmt(double v) =>
       v >= 1000 ? '${(v / 1000).toStringAsFixed(1)}K' : v.toStringAsFixed(0);
@@ -14,7 +14,9 @@ class StatCardsRow extends StatelessWidget {
       v >= 1000 ? '${(v / 1000).toStringAsFixed(1)}K' : v.toString();
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final stats = ref.watch(dashboardProvider);
+    
     final cards = [
       StatBentoCard(
         title: 'Revenue', value: '\$${_fmt(stats.totalRevenue)}',
@@ -53,24 +55,24 @@ class StatCardsRow extends StatelessWidget {
           children: cards
               .map((c) => Expanded(
             child: Padding(
-                padding: const EdgeInsets.only(right: 12), child: c),
+                padding: const EdgeInsets.only(right: 16), child: c),
           ))
               .toList(),
         );
       }
       
-      // Adaptive aspect ratio instead of hardcoded 1.4
       final width = constraints.maxWidth;
-      final childWidth = (width - 12) / 2; // 2 columns
-      final childHeight = 120.0; // Desired height
+      final childWidth = (width - 16) / 2; // 2 columns
+      // INCREASED HEIGHT: Fixed overflow by increasing base height from 120 to 140
+      final childHeight = 140.0; 
       final adaptiveRatio = childWidth / childHeight;
 
       return GridView.count(
         crossAxisCount: 2,
         shrinkWrap: true,
         physics: const NeverScrollableScrollPhysics(),
-        mainAxisSpacing: 12,
-        crossAxisSpacing: 12,
+        mainAxisSpacing: 16,
+        crossAxisSpacing: 16,
         childAspectRatio: adaptiveRatio,
         children: cards,
       );

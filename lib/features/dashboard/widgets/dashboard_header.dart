@@ -5,6 +5,7 @@ import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_text_styles.dart';
 import '../../../shared/widgets/glass_card.dart';
 import '../../../shared/widgets/gradient_badge.dart';
+import '../../../core/constants/app_strings.dart';
 import '../../auth/providers/auth_provider.dart';
 
 class DashboardHeader extends ConsumerWidget {
@@ -25,26 +26,28 @@ class DashboardHeader extends ConsumerWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                FittedBox(
-                  fit: BoxFit.scaleDown,
-                  alignment: Alignment.centerLeft,
-                  child: Row(children: [
-                    Text('Good morning, $name',
-                        style: AppTextStyles.displayMedium),
-                    const SizedBox(width: 8),
+                Wrap(
+                  crossAxisAlignment: WrapCrossAlignment.center,
+                  spacing: 12,
+                  runSpacing: 8,
+                  children: [
+                    Text(
+                      '${AppStrings.dashboardGreeting}, $name',
+                      style: AppTextStyles.displayMedium,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    ),
                     const Text('👋', style: TextStyle(fontSize: 22)),
-                    if (user?.plan != 'free') ...[
-                      const SizedBox(width: 12),
+                    if (user?.plan != 'free')
                       GradientBadge(
                         label: user?.plan.toUpperCase() ?? 'PRO',
                         gradient: AppColors.violetGradient,
                       ),
-                    ],
-                  ]),
+                  ],
                 ),
                 const SizedBox(height: 4),
                 Text(
-                  'Here\'s what\'s happening with your platform today.',
+                  AppStrings.dashboardSubtitle,
                   style: AppTextStyles.bodyLarge,
                   maxLines: 2,
                   overflow: TextOverflow.ellipsis,

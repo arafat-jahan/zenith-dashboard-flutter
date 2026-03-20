@@ -24,6 +24,7 @@ mixin _$ChatMessage {
   String get text => throw _privateConstructorUsedError;
   bool get isUser => throw _privateConstructorUsedError;
   DateTime get timestamp => throw _privateConstructorUsedError;
+  bool get isError => throw _privateConstructorUsedError;
 
   /// Serializes this ChatMessage to a JSON map.
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
@@ -42,7 +43,7 @@ abstract class $ChatMessageCopyWith<$Res> {
     $Res Function(ChatMessage) then,
   ) = _$ChatMessageCopyWithImpl<$Res, ChatMessage>;
   @useResult
-  $Res call({String text, bool isUser, DateTime timestamp});
+  $Res call({String text, bool isUser, DateTime timestamp, bool isError});
 }
 
 /// @nodoc
@@ -63,6 +64,7 @@ class _$ChatMessageCopyWithImpl<$Res, $Val extends ChatMessage>
     Object? text = null,
     Object? isUser = null,
     Object? timestamp = null,
+    Object? isError = null,
   }) {
     return _then(
       _value.copyWith(
@@ -78,6 +80,10 @@ class _$ChatMessageCopyWithImpl<$Res, $Val extends ChatMessage>
                 ? _value.timestamp
                 : timestamp // ignore: cast_nullable_to_non_nullable
                       as DateTime,
+            isError: null == isError
+                ? _value.isError
+                : isError // ignore: cast_nullable_to_non_nullable
+                      as bool,
           )
           as $Val,
     );
@@ -93,7 +99,7 @@ abstract class _$$ChatMessageImplCopyWith<$Res>
   ) = __$$ChatMessageImplCopyWithImpl<$Res>;
   @override
   @useResult
-  $Res call({String text, bool isUser, DateTime timestamp});
+  $Res call({String text, bool isUser, DateTime timestamp, bool isError});
 }
 
 /// @nodoc
@@ -113,6 +119,7 @@ class __$$ChatMessageImplCopyWithImpl<$Res>
     Object? text = null,
     Object? isUser = null,
     Object? timestamp = null,
+    Object? isError = null,
   }) {
     return _then(
       _$ChatMessageImpl(
@@ -128,6 +135,10 @@ class __$$ChatMessageImplCopyWithImpl<$Res>
             ? _value.timestamp
             : timestamp // ignore: cast_nullable_to_non_nullable
                   as DateTime,
+        isError: null == isError
+            ? _value.isError
+            : isError // ignore: cast_nullable_to_non_nullable
+                  as bool,
       ),
     );
   }
@@ -140,6 +151,7 @@ class _$ChatMessageImpl implements _ChatMessage {
     required this.text,
     required this.isUser,
     required this.timestamp,
+    this.isError = false,
   });
 
   factory _$ChatMessageImpl.fromJson(Map<String, dynamic> json) =>
@@ -151,10 +163,13 @@ class _$ChatMessageImpl implements _ChatMessage {
   final bool isUser;
   @override
   final DateTime timestamp;
+  @override
+  @JsonKey()
+  final bool isError;
 
   @override
   String toString() {
-    return 'ChatMessage(text: $text, isUser: $isUser, timestamp: $timestamp)';
+    return 'ChatMessage(text: $text, isUser: $isUser, timestamp: $timestamp, isError: $isError)';
   }
 
   @override
@@ -165,12 +180,14 @@ class _$ChatMessageImpl implements _ChatMessage {
             (identical(other.text, text) || other.text == text) &&
             (identical(other.isUser, isUser) || other.isUser == isUser) &&
             (identical(other.timestamp, timestamp) ||
-                other.timestamp == timestamp));
+                other.timestamp == timestamp) &&
+            (identical(other.isError, isError) || other.isError == isError));
   }
 
   @JsonKey(includeFromJson: false, includeToJson: false)
   @override
-  int get hashCode => Object.hash(runtimeType, text, isUser, timestamp);
+  int get hashCode =>
+      Object.hash(runtimeType, text, isUser, timestamp, isError);
 
   /// Create a copy of ChatMessage
   /// with the given fields replaced by the non-null parameter values.
@@ -191,6 +208,7 @@ abstract class _ChatMessage implements ChatMessage {
     required final String text,
     required final bool isUser,
     required final DateTime timestamp,
+    final bool isError,
   }) = _$ChatMessageImpl;
 
   factory _ChatMessage.fromJson(Map<String, dynamic> json) =
@@ -202,6 +220,8 @@ abstract class _ChatMessage implements ChatMessage {
   bool get isUser;
   @override
   DateTime get timestamp;
+  @override
+  bool get isError;
 
   /// Create a copy of ChatMessage
   /// with the given fields replaced by the non-null parameter values.
@@ -220,6 +240,9 @@ mixin _$ChatState {
   List<ChatMessage> get messages => throw _privateConstructorUsedError;
   bool get isTyping => throw _privateConstructorUsedError;
   String get selectedModel => throw _privateConstructorUsedError;
+  String get streamingText => throw _privateConstructorUsedError;
+  bool get hasStreamingError => throw _privateConstructorUsedError;
+  String? get lastPrompt => throw _privateConstructorUsedError;
 
   /// Serializes this ChatState to a JSON map.
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
@@ -236,7 +259,14 @@ abstract class $ChatStateCopyWith<$Res> {
   factory $ChatStateCopyWith(ChatState value, $Res Function(ChatState) then) =
       _$ChatStateCopyWithImpl<$Res, ChatState>;
   @useResult
-  $Res call({List<ChatMessage> messages, bool isTyping, String selectedModel});
+  $Res call({
+    List<ChatMessage> messages,
+    bool isTyping,
+    String selectedModel,
+    String streamingText,
+    bool hasStreamingError,
+    String? lastPrompt,
+  });
 }
 
 /// @nodoc
@@ -257,6 +287,9 @@ class _$ChatStateCopyWithImpl<$Res, $Val extends ChatState>
     Object? messages = null,
     Object? isTyping = null,
     Object? selectedModel = null,
+    Object? streamingText = null,
+    Object? hasStreamingError = null,
+    Object? lastPrompt = freezed,
   }) {
     return _then(
       _value.copyWith(
@@ -272,6 +305,18 @@ class _$ChatStateCopyWithImpl<$Res, $Val extends ChatState>
                 ? _value.selectedModel
                 : selectedModel // ignore: cast_nullable_to_non_nullable
                       as String,
+            streamingText: null == streamingText
+                ? _value.streamingText
+                : streamingText // ignore: cast_nullable_to_non_nullable
+                      as String,
+            hasStreamingError: null == hasStreamingError
+                ? _value.hasStreamingError
+                : hasStreamingError // ignore: cast_nullable_to_non_nullable
+                      as bool,
+            lastPrompt: freezed == lastPrompt
+                ? _value.lastPrompt
+                : lastPrompt // ignore: cast_nullable_to_non_nullable
+                      as String?,
           )
           as $Val,
     );
@@ -287,7 +332,14 @@ abstract class _$$ChatStateImplCopyWith<$Res>
   ) = __$$ChatStateImplCopyWithImpl<$Res>;
   @override
   @useResult
-  $Res call({List<ChatMessage> messages, bool isTyping, String selectedModel});
+  $Res call({
+    List<ChatMessage> messages,
+    bool isTyping,
+    String selectedModel,
+    String streamingText,
+    bool hasStreamingError,
+    String? lastPrompt,
+  });
 }
 
 /// @nodoc
@@ -307,6 +359,9 @@ class __$$ChatStateImplCopyWithImpl<$Res>
     Object? messages = null,
     Object? isTyping = null,
     Object? selectedModel = null,
+    Object? streamingText = null,
+    Object? hasStreamingError = null,
+    Object? lastPrompt = freezed,
   }) {
     return _then(
       _$ChatStateImpl(
@@ -322,6 +377,18 @@ class __$$ChatStateImplCopyWithImpl<$Res>
             ? _value.selectedModel
             : selectedModel // ignore: cast_nullable_to_non_nullable
                   as String,
+        streamingText: null == streamingText
+            ? _value.streamingText
+            : streamingText // ignore: cast_nullable_to_non_nullable
+                  as String,
+        hasStreamingError: null == hasStreamingError
+            ? _value.hasStreamingError
+            : hasStreamingError // ignore: cast_nullable_to_non_nullable
+                  as bool,
+        lastPrompt: freezed == lastPrompt
+            ? _value.lastPrompt
+            : lastPrompt // ignore: cast_nullable_to_non_nullable
+                  as String?,
       ),
     );
   }
@@ -334,6 +401,9 @@ class _$ChatStateImpl implements _ChatState {
     final List<ChatMessage> messages = const [],
     this.isTyping = false,
     this.selectedModel = 'zenith-ultra',
+    this.streamingText = '',
+    this.hasStreamingError = false,
+    this.lastPrompt,
   }) : _messages = messages;
 
   factory _$ChatStateImpl.fromJson(Map<String, dynamic> json) =>
@@ -354,10 +424,18 @@ class _$ChatStateImpl implements _ChatState {
   @override
   @JsonKey()
   final String selectedModel;
+  @override
+  @JsonKey()
+  final String streamingText;
+  @override
+  @JsonKey()
+  final bool hasStreamingError;
+  @override
+  final String? lastPrompt;
 
   @override
   String toString() {
-    return 'ChatState(messages: $messages, isTyping: $isTyping, selectedModel: $selectedModel)';
+    return 'ChatState(messages: $messages, isTyping: $isTyping, selectedModel: $selectedModel, streamingText: $streamingText, hasStreamingError: $hasStreamingError, lastPrompt: $lastPrompt)';
   }
 
   @override
@@ -369,7 +447,13 @@ class _$ChatStateImpl implements _ChatState {
             (identical(other.isTyping, isTyping) ||
                 other.isTyping == isTyping) &&
             (identical(other.selectedModel, selectedModel) ||
-                other.selectedModel == selectedModel));
+                other.selectedModel == selectedModel) &&
+            (identical(other.streamingText, streamingText) ||
+                other.streamingText == streamingText) &&
+            (identical(other.hasStreamingError, hasStreamingError) ||
+                other.hasStreamingError == hasStreamingError) &&
+            (identical(other.lastPrompt, lastPrompt) ||
+                other.lastPrompt == lastPrompt));
   }
 
   @JsonKey(includeFromJson: false, includeToJson: false)
@@ -379,6 +463,9 @@ class _$ChatStateImpl implements _ChatState {
     const DeepCollectionEquality().hash(_messages),
     isTyping,
     selectedModel,
+    streamingText,
+    hasStreamingError,
+    lastPrompt,
   );
 
   /// Create a copy of ChatState
@@ -400,6 +487,9 @@ abstract class _ChatState implements ChatState {
     final List<ChatMessage> messages,
     final bool isTyping,
     final String selectedModel,
+    final String streamingText,
+    final bool hasStreamingError,
+    final String? lastPrompt,
   }) = _$ChatStateImpl;
 
   factory _ChatState.fromJson(Map<String, dynamic> json) =
@@ -411,6 +501,12 @@ abstract class _ChatState implements ChatState {
   bool get isTyping;
   @override
   String get selectedModel;
+  @override
+  String get streamingText;
+  @override
+  bool get hasStreamingError;
+  @override
+  String? get lastPrompt;
 
   /// Create a copy of ChatState
   /// with the given fields replaced by the non-null parameter values.

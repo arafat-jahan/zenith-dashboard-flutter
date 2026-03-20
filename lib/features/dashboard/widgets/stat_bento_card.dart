@@ -25,7 +25,7 @@ class StatBentoCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return GlassCard(
       glowColor: glowColor.withValues(alpha: 0.15),
-      glowRadius: 20,
+      glowRadius: 40,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -66,11 +66,44 @@ class StatBentoCard extends StatelessWidget {
             children: [
               Text(title, style: AppTextStyles.bodySmall),
               const SizedBox(height: 2),
-              Text(value, style: AppTextStyles.headlineMedium.copyWith(letterSpacing: -0.5)),
+              _AnimatedValueText(value: value),
             ],
           ),
         ],
       ),
+    );
+  }
+}
+
+class _AnimatedValueText extends StatelessWidget {
+  final String value;
+  const _AnimatedValueText({required this.value});
+
+  @override
+  Widget build(BuildContext context) {
+    // Parse value: e.g., '$2.4M', '94ms', '18.2%'
+    final numericPart = RegExp(r'[0-9.]+').firstMatch(value)?.group(0) ?? '0';
+    final prefix = value.split(numericPart).first;
+    final suffix = value.split(numericPart).last;
+    final targetValue = double.tryParse(numericPart) ?? 0.0;
+    final isInteger = !numericPart.contains('.');
+
+    return TweenAnimationBuilder<double>(
+      tween: Tween<double>(begin: 0, end: targetValue),
+      duration: const Duration(milliseconds: 1200),
+      curve: Curves.easeOutExpo,
+      builder: (context, val, child) {
+        String display;
+        if (isInteger) {
+          display = val.toInt().toString();
+        } else {
+          display = val.toStringAsFixed(1);
+        }
+        return Text(
+          '$prefix$display$suffix',
+          style: AppTextStyles.headlineMedium.copyWith(letterSpacing: -0.5),
+        );
+      },
     );
   }
 }

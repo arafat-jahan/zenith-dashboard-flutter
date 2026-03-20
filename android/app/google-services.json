@@ -9,13 +9,13 @@
       "client_info": {
         "mobilesdk_app_id": "1:833914734243:android:aa221c3907a85ce6b76116",
         "android_client_info": {
-          "package_name": "com.example.ui_kit"
+          "package_name": "com.yourname.zenith_ai"
         }
       },
       "oauth_client": [],
       "api_key": [
         {
-          "current_key": "AIzaSyDhsqhH0Byy3nXFiWSN5lVtmHXc_9QWRYo"
+          "current_key": ""
         }
       ],
       "services": {

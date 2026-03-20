@@ -1,4 +1,4 @@
-package com.example.ui_kit
+package com.yourname.zenith_ai
 
 import io.flutter.embedding.android.FlutterActivity
 

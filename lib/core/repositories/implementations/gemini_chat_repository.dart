@@ -1,89 +1,110 @@
+import 'dart:async';
 import 'package:google_generative_ai/google_generative_ai.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter/foundation.dart';
 import '../../models/user_model.dart';
 import '../interfaces/i_chat_repository.dart';
 
 class GeminiChatRepository implements IChatRepository {
   final FirebaseFirestore _db;
 
-  // --- CRITICAL SECURITY COMMENT ---
-  // Calling LLMs directly from the client is a major security risk.
-  // An attacker could decompile the app, extract the API key, and use it for free,
-  // leading to massive bills.
-  //
-  // PRODUCTION SOLUTION: Move this logic to a Firebase Cloud Function.
-  // 1. Create an HTTP-callable function `generateGeminiResponse`.
-  // 2. The client calls this function via `FirebaseFunctions.instance.httpsCallable('...')`.
-  // 3. The function authenticates the user, validates their plan, and *then* securely
-  //    calls the Gemini API using a key stored in Firebase Secret Manager.
-  // This prevents the API key from ever being on the client device.
+  // Hardcoded limits to protect infrastructure
+  static const int _maxPromptLength = 4000;
+
   static const _geminiApiKey = String.fromEnvironment(
     'GEMINI_API_KEY',
-    defaultValue: 'AIzaSyA8p1pTNjSqj1chw4dnaojbQRoj6VAZEKQ',
+    defaultValue: '',
   );
 
   GeminiChatRepository(this._db);
 
+  /// Sanitizes input to prevent injection & limit abuse
+  String _sanitizeInput(String input) {
+    String sanitized = input.trim();
+    if (sanitized.length > _maxPromptLength) {
+      sanitized = sanitized.substring(0, _maxPromptLength);
+    }
+    // Additional regex sanitization can be added here
+    return sanitized;
+  }
+
   @override
-  Future<String> generateResponse(UserModel user, String prompt, {String modelName = 'zenith-flash'}) async {
+  Stream<String> generateResponseStream(UserModel user, String prompt, {String modelName = 'zenith-flash'}) async* {
+    final safePrompt = _sanitizeInput(prompt);
+    if (safePrompt.isEmpty) return;
+
+    if (_geminiApiKey.isEmpty) {
+      // PRO-LEVEL MOCK MODE: Show the typewriter animation even without a key
+      yield 'Hello! I am Zenith AI. Currently, I am running in **Demo Mode** because no API Key was found.';
+      await Future.delayed(const Duration(milliseconds: 800));
+      yield '\n\nYou can still test my UI and see how the **Typewriter Streaming** animation feels.';
+      await Future.delayed(const Duration(milliseconds: 600));
+      yield '\n\nTo enable real AI responses, please add your `GEMINI_API_KEY` to the `.env` file or pass it via `--dart-define`.';
+      return;
+    }
+
+    final geminiModel = _mapToGeminiModel(modelName);
+    StringBuffer accumulatedResponse = StringBuffer();
+
     try {
-      final modelId = _getModelId(modelName);
-      
-      // Use v1 API instead of v1beta for better stability in most regions
       final model = GenerativeModel(
-        model: modelId,
+        model: geminiModel,
         apiKey: _geminiApiKey,
       );
-      
-      final response = await model.generateContent([Content.text(prompt)]);
-      final responseText = response.text;
 
-      if (responseText != null) {
-        // Atomically update usage and save history in a single batch
-        final batch = _db.batch();
-        final userRef = _db.collection('users').doc(user.id);
-        final chatRef = userRef.collection('chats').doc();
+      // Apply a strict timeout to the stream initialization
+      final responseStream = model.generateContentStream([Content.text(safePrompt)])
+          .timeout(const Duration(seconds: 15));
 
-        batch.update(userRef, {'tokenUsage': FieldValue.increment(1)});
-        batch.set(chatRef, {
-          'prompt': prompt,
-          'response': responseText,
-          'timestamp': FieldValue.serverTimestamp(),
-        });
-
-        await batch.commit();
-        return responseText;
-      }
-      throw Exception('Empty response from Gemini');
-    } catch (e) {
-      // If latest models fail, try the most basic stable one as absolute fallback
-      if (e.toString().contains('not found') || e.toString().contains('404')) {
-        try {
-          final fallbackModel = GenerativeModel(model: 'gemini-1.5-flash', apiKey: _geminiApiKey);
-          final response = await fallbackModel.generateContent([Content.text(prompt)]);
-          return response.text ?? 'Error: Empty response';
-        } catch (inner) {
-          // If even fallback fails, let's try gemini-pro (v1)
-          try {
-            final superFallback = GenerativeModel(model: 'gemini-pro', apiKey: _geminiApiKey);
-            final resp = await superFallback.generateContent([Content.text(prompt)]);
-            return resp.text ?? 'Error: Empty response';
-          } catch (last) {
-            rethrow;
-          }
+      await for (final chunk in responseStream) {
+        final text = chunk.text;
+        if (text != null) {
+          accumulatedResponse.write(text);
+          yield text;
         }
       }
-      rethrow;
+
+      // After stream completes, we persist the chat.
+      // NOTE: In production, token counting and usage updates MUST be handled
+      // by a Firebase Cloud Function (backend) to prevent client-side exploits.
+      final responseText = accumulatedResponse.toString();
+      if (responseText.isNotEmpty) {
+        await _persistChatToDb(user, safePrompt, responseText);
+      }
+
+    } on TimeoutException {
+      debugPrint('Gemini Stream Error: Request Timed Out');
+      yield 'Error: The model took too long to respond. Please try again.';
+    } catch (e) {
+      debugPrint('Gemini Stream Error: ${e.toString()}');
+      yield 'Error: AI model is temporarily unavailable. Please check your API key, billing status, and VPN connection.';
     }
   }
 
-  String _getModelId(String modelName) {
+  Future<void> _persistChatToDb(UserModel user, String prompt, String responseText) async {
+    final batch = _db.batch();
+    final userRef = _db.collection('users').doc(user.id);
+    final chatRef = userRef.collection('chats').doc();
+
+    // We only save the history on the client. 
+    // The 'tokenUsage' increment logic is removed from here 
+    // and should be implemented in a Firestore Trigger (Cloud Function).
+    batch.set(chatRef, {
+      'prompt': prompt,
+      'response': responseText,
+      'timestamp': FieldValue.serverTimestamp(),
+    });
+
+    await batch.commit();
+  }
+
+  String _mapToGeminiModel(String modelName) {
     switch (modelName) {
-      case 'zenith-ultra': return 'gemini-1.5-pro-latest';
-      case 'zenith-pro':   return 'gemini-1.5-flash-latest';
-      case 'zenith-flash': return 'gemini-1.5-flash-latest';
+      case 'zenith-ultra': return 'gemini-1.5-pro';
+      case 'zenith-pro':   return 'gemini-1.5-pro';
+      case 'zenith-flash': return 'gemini-1.5-flash';
       case 'zenith-nano':  return 'gemini-1.5-flash';
-      default: return 'gemini-1.5-flash-latest';
+      default:             return 'gemini-1.5-flash';
     }
   }
 }

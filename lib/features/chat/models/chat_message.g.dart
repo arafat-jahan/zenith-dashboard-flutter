@@ -11,6 +11,7 @@ _$ChatMessageImpl _$$ChatMessageImplFromJson(Map<String, dynamic> json) =>
       text: json['text'] as String,
       isUser: json['isUser'] as bool,
       timestamp: DateTime.parse(json['timestamp'] as String),
+      isError: json['isError'] as bool? ?? false,
     );
 
 Map<String, dynamic> _$$ChatMessageImplToJson(_$ChatMessageImpl instance) =>
@@ -18,6 +19,7 @@ Map<String, dynamic> _$$ChatMessageImplToJson(_$ChatMessageImpl instance) =>
       'text': instance.text,
       'isUser': instance.isUser,
       'timestamp': instance.timestamp.toIso8601String(),
+      'isError': instance.isError,
     };
 
 _$ChatStateImpl _$$ChatStateImplFromJson(Map<String, dynamic> json) =>
@@ -29,6 +31,9 @@ _$ChatStateImpl _$$ChatStateImplFromJson(Map<String, dynamic> json) =>
           const [],
       isTyping: json['isTyping'] as bool? ?? false,
       selectedModel: json['selectedModel'] as String? ?? 'zenith-ultra',
+      streamingText: json['streamingText'] as String? ?? '',
+      hasStreamingError: json['hasStreamingError'] as bool? ?? false,
+      lastPrompt: json['lastPrompt'] as String?,
     );
 
 Map<String, dynamic> _$$ChatStateImplToJson(_$ChatStateImpl instance) =>
@@ -36,4 +41,7 @@ Map<String, dynamic> _$$ChatStateImplToJson(_$ChatStateImpl instance) =>
       'messages': instance.messages,
       'isTyping': instance.isTyping,
       'selectedModel': instance.selectedModel,
+      'streamingText': instance.streamingText,
+      'hasStreamingError': instance.hasStreamingError,
+      'lastPrompt': instance.lastPrompt,
     };

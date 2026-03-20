@@ -10,11 +10,8 @@ class FirebaseAuthRepository implements IAuthRepository {
   FirebaseAuthRepository(this._auth);
 
   @override
-  Stream<UserModel?> get authStateChanges {
-    return _auth.authStateChanges().asyncMap((user) {
-      if (user == null) return null;
-      return getUserProfile(user.uid);
-    });
+  Stream<User?> get authStateChanges {
+    return _auth.authStateChanges();
   }
 
   @override

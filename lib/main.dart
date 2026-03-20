@@ -1,39 +1,42 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:responsive_framework/responsive_framework.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'core/theme/app_theme.dart';
-import 'core/theme/app_colors.dart';
-import 'features/auth/screens/login_screen.dart';
+import 'core/providers/provider_logger.dart';
+import 'features/splash/splash_screen.dart';
 import 'firebase_options.dart';
+
+// Global flag for Mock Mode (fallback if Firebase fails)
+final isMockModeProvider = StateProvider<bool>((ref) => false);
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  
+
   // Initialize Firebase
+  bool firebaseFailed = false;
   try {
-    await Firebase.initializeApp(
-      options: DefaultFirebaseOptions.currentPlatform,
-    );
+    final apiKey = DefaultFirebaseOptions.currentPlatform.apiKey;
+    if (apiKey.isEmpty || apiKey == "null") {
+      firebaseFailed = true;
+      debugPrint("Firebase API Key is missing. Using Mock Mode.");
+    } else {
+      await Firebase.initializeApp(
+        options: DefaultFirebaseOptions.currentPlatform,
+      ).timeout(const Duration(seconds: 5));
+    }
   } catch (e) {
     debugPrint("Firebase initialization failed: $e");
-    try {
-      await Firebase.initializeApp();
-    } catch (innerError) {
-      debugPrint("Fallback Firebase initialization failed: $innerError");
-    }
+    firebaseFailed = true;
   }
-  
-  SystemChrome.setSystemUIOverlayStyle(
-    const SystemUiOverlayStyle(
-      statusBarColor: Colors.transparent,
-      statusBarIconBrightness: Brightness.light,
-      systemNavigationBarColor: AppColors.bgDeep,
-    ),
-  );
 
-  runApp(const ProviderScope(child: ZenithApp()));
+  runApp(ProviderScope(
+    observers: [ProviderLogger()],
+    overrides: [
+      isMockModeProvider.overrideWith((ref) => firebaseFailed),
+    ],
+    child: const ZenithApp(),
+  ));
 }
 
 class ZenithApp extends StatelessWidget {
@@ -54,7 +57,7 @@ class ZenithApp extends StatelessWidget {
       title: 'Zenith AI — Dashboard',
       debugShowCheckedModeBanner: false,
       theme: AppTheme.darkTheme,
-      home: const LoginScreen(),
+      home: const SplashScreen(),
     );
   }
 }

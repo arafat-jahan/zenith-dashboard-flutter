@@ -9,7 +9,7 @@ class DashboardStats {
   final double successRate;
   final bool isLoading;
 
-  DashboardStats({
+  const DashboardStats({
     required this.totalRevenue,
     required this.activeUsers,
     required this.apiCalls,
@@ -18,7 +18,7 @@ class DashboardStats {
     this.isLoading = false,
   });
 
-  factory DashboardStats.empty() => DashboardStats(
+  factory DashboardStats.empty() => const DashboardStats(
     totalRevenue: 0,
     activeUsers: 0,
     apiCalls: 0,
@@ -26,27 +26,41 @@ class DashboardStats {
     successRate: 0,
     isLoading: true,
   );
+
+  DashboardStats copyWith({
+    double? totalRevenue,
+    int? activeUsers,
+    int? apiCalls,
+    double? avgLatency,
+    double? successRate,
+    bool? isLoading,
+  }) {
+    return DashboardStats(
+      totalRevenue: totalRevenue ?? this.totalRevenue,
+      activeUsers: activeUsers ?? this.activeUsers,
+      apiCalls: apiCalls ?? this.apiCalls,
+      avgLatency: avgLatency ?? this.avgLatency,
+      successRate: successRate ?? this.successRate,
+      isLoading: isLoading ?? this.isLoading,
+    );
+  }
 }
 
-class DashboardNotifier extends StateNotifier<DashboardStats> {
-  DashboardNotifier() : super(DashboardStats.empty()) {
-    refresh();
+class DashboardNotifier extends Notifier<DashboardStats> {
+  @override
+  DashboardStats build() {
+    // Start fetching data immediately
+    Future.microtask(() => refresh());
+    return DashboardStats.empty();
   }
 
   Future<void> refresh() async {
-    state = DashboardStats(
-      totalRevenue: state.totalRevenue,
-      activeUsers: state.activeUsers,
-      apiCalls: state.apiCalls,
-      avgLatency: state.avgLatency,
-      successRate: state.successRate,
-      isLoading: true,
-    );
+    state = state.copyWith(isLoading: true);
     
-    // Mock data fetching
+    // Mock data fetching with high-end simulated delay
     await Future.delayed(const Duration(seconds: 1));
     
-    state = DashboardStats(
+    state = const DashboardStats(
       totalRevenue: 124500.0,
       activeUsers: 24500,
       apiCalls: 12500000,
@@ -57,6 +71,4 @@ class DashboardNotifier extends StateNotifier<DashboardStats> {
   }
 }
 
-final dashboardProvider = StateNotifierProvider<DashboardNotifier, DashboardStats>((ref) {
-  return DashboardNotifier();
-});
+final dashboardProvider = NotifierProvider<DashboardNotifier, DashboardStats>(DashboardNotifier.new);

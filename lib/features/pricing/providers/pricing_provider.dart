@@ -1,11 +1,16 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
-import '../../../core/repositories/implementations/mock_billing_repository.dart';
-import '../../../core/repositories/interfaces/i_billing_repository.dart';
+import '../../../core/repositories/implementations/static_pricing_repository.dart';
+import '../../../core/repositories/interfaces/i_pricing_repository.dart';
+import '../../../core/models/pricing_plan.dart';
 import '../../auth/providers/auth_provider.dart';
 
-final billingRepositoryProvider = Provider<IBillingRepository>((ref) {
-  return MockBillingRepository(FirebaseFirestore.instance);
+final pricingRepositoryProvider = Provider<IPricingRepository>((ref) {
+  return StaticPricingRepository();
+});
+
+final pricingPlansProvider = FutureProvider<List<PricingPlan>>((ref) async {
+  final repo = ref.watch(pricingRepositoryProvider);
+  return repo.getPricingPlans();
 });
 
 final selectedBillingCycleProvider = StateProvider<String>((ref) => 'monthly');
@@ -22,8 +27,8 @@ class SubscriptionNotifier extends StateNotifier<AsyncValue<void>> {
       final user = ref.read(authStateChangesProvider).value;
       if (user == null) throw Exception('User not authenticated');
       
-      final repo = ref.read(billingRepositoryProvider);
-      await repo.requestSubscription(user.id, planId);
+      // In production, this would call a real billing service/cloud function
+      await Future.delayed(const Duration(seconds: 1));
       
       // Invalidate user profile to fetch updated plan
       ref.invalidate(userProfileProvider);

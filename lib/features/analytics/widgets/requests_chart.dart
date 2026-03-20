@@ -6,10 +6,17 @@ import '../../../shared/widgets/glass_card.dart';
 import '../../../shared/widgets/gradient_badge.dart';
 
 class RequestsChart extends StatelessWidget {
-  const RequestsChart({super.key});
+  final bool isLoading;
+  const RequestsChart({super.key, this.isLoading = false});
 
   @override
   Widget build(BuildContext context) {
+    if (isLoading) {
+      return const GlassCard(
+        height: 260,
+        child: Center(child: CircularProgressIndicator(strokeWidth: 2, color: AppColors.accentBlue)),
+      );
+    }
     final spots = [
       const FlSpot(0, 1.2), const FlSpot(1, 1.8), const FlSpot(2, 1.5),
       const FlSpot(3, 2.3), const FlSpot(4, 2.1), const FlSpot(5, 2.9),
