@@ -35,7 +35,7 @@ class AppShell extends ConsumerWidget {
       backgroundColor: AppColors.bgDeep,
       body: currentScreen,
       bottomNavigationBar: _MobileNav(
-        currentIndex: index.clamp(0, NavConfig.platformItems.length - 1),
+        currentIndex: index.clamp(0, 4), // Fixed at max 5 items for mobile
         onTap: (i) => ref.read(selectedNavIndexProvider.notifier).state = i,
       ),
     );
@@ -49,8 +49,8 @@ class _MobileNav extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // Show all platform items in mobile bottom bar
-    final items = NavConfig.platformItems;
+    // Fix: Show max 5 items in mobile bottom bar
+    final items = NavConfig.platformItems.take(5).toList();
 
     return Container(
       decoration: const BoxDecoration(

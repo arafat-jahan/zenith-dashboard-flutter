@@ -2,6 +2,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:lucide_icons/lucide_icons.dart';
+import 'package:responsive_framework/responsive_framework.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_text_styles.dart';
 import '../../../shared/widgets/glass_card.dart';
@@ -18,6 +19,8 @@ class NotificationsScreen extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final filter = ref.watch(_notifFilterProvider);
     final notifsAsync = ref.watch(notificationsProvider);
+    final isMobile = ResponsiveBreakpoints.of(context).isMobile;
+    final hPadding = isMobile ? 16.0 : 24.0;
 
     return Scaffold(
       backgroundColor: AppColors.bgDeep,
@@ -25,26 +28,33 @@ class NotificationsScreen extends ConsumerWidget {
         slivers: [
           SliverToBoxAdapter(
             child: Padding(
-              padding: const EdgeInsets.fromLTRB(24, 28, 24, 20),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                    Text('Notifications', style: AppTextStyles.displayMedium),
-                    const SizedBox(height: 4),
-                    Text('Stay on top of your platform activity', style: AppTextStyles.bodyLarge),
-                  ]),
-                  GlassCard(
-                    padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
-                    onTap: () {},
-                    child: Row(children: [
-                      const Icon(LucideIcons.check, size: 14, color: AppColors.accentViolet),
-                      const SizedBox(width: 6),
-                      Text('Mark all read', style: AppTextStyles.labelLarge.copyWith(color: AppColors.accentViolet)),
-                    ]),
+              padding: EdgeInsets.fromLTRB(hPadding, 28, hPadding, 20),
+              child: isMobile 
+                ? Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Text('Notifications', style: AppTextStyles.displayMedium),
+                          _MarkReadAllBtn(),
+                        ],
+                      ),
+                      const SizedBox(height: 8),
+                      Text('Stay on top of your platform activity', style: AppTextStyles.bodyLarge),
+                    ],
+                  )
+                : Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                        Text('Notifications', style: AppTextStyles.displayMedium),
+                        const SizedBox(height: 4),
+                        Text('Stay on top of your platform activity', style: AppTextStyles.bodyLarge),
+                      ]),
+                      _MarkReadAllBtn(),
+                    ],
                   ),
-                ],
-              ),
             ),
           ),
 
@@ -52,7 +62,7 @@ class NotificationsScreen extends ConsumerWidget {
           SliverToBoxAdapter(
             child: SingleChildScrollView(
               scrollDirection: Axis.horizontal,
-              padding: const EdgeInsets.symmetric(horizontal: 20),
+              padding: EdgeInsets.symmetric(horizontal: hPadding),
               child: Row(children: ['All', 'Billing', 'Updates', 'Incidents', 'Team'].map((f) {
                 final isSelected = filter == f;
                 return Padding(
@@ -81,7 +91,7 @@ class NotificationsScreen extends ConsumerWidget {
 
           // Notif list
           SliverPadding(
-            padding: const EdgeInsets.fromLTRB(20, 24, 20, 40),
+            padding: EdgeInsets.fromLTRB(hPadding, 24, hPadding, 40),
             sliver: notifsAsync.when(
               data: (notifs) {
                 final filtered = filter == 'All' ? notifs : notifs.where((n) => n.category == filter).toList();
@@ -102,14 +112,32 @@ class NotificationsScreen extends ConsumerWidget {
                 delegate: SliverChildBuilderDelegate(
                   (ctx, i) => const Padding(
                     padding: EdgeInsets.only(bottom: 12),
-                    child: BaseShimmer(height: 100),
+                    child: BaseShimmer(height: 80),
                   ),
                   childCount: 5,
                 ),
               ),
-              error: (err, _) => SliverToBoxAdapter(child: Center(child: Text('Error: $err'))),
+              error: (err, _) => SliverFillRemaining(hasScrollBody: false, child: Center(child: Text('Error: $err'))),
             ),
           ),
+        ],
+      ),
+    );
+  }
+}
+
+class _MarkReadAllBtn extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return GlassCard(
+      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+      onTap: () {},
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          const Icon(LucideIcons.check, size: 14, color: AppColors.accentViolet),
+          const SizedBox(width: 6),
+          Text('Mark all read', style: AppTextStyles.labelLarge.copyWith(color: AppColors.accentViolet)),
         ],
       ),
     );

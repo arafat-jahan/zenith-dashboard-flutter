@@ -2,13 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:responsive_framework/responsive_framework.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'core/providers/app_state_provider.dart';
 import 'core/theme/app_theme.dart';
 import 'core/providers/provider_logger.dart';
 import 'features/splash/splash_screen.dart';
 import 'firebase_options.dart';
-
-// Global flag for Mock Mode (fallback if Firebase fails)
-final isMockModeProvider = StateProvider<bool>((ref) => false);
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();

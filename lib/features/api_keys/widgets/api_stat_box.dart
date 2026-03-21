@@ -12,14 +12,16 @@ class ApiStatBox extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return GlassCard(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 14),
       child: Row(children: [
         Icon(icon, size: 16, color: color),
-        const SizedBox(width: 12),
-        Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-          Text(label, style: AppTextStyles.labelSmall),
-          Text(value, style: AppTextStyles.labelLarge.copyWith(color: AppColors.textPrimary)),
-        ]),
+        const SizedBox(width: 8),
+        Expanded(
+          child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+            Text(label, style: AppTextStyles.labelSmall, maxLines: 1, overflow: TextOverflow.ellipsis),
+            Text(value, style: AppTextStyles.labelLarge.copyWith(color: AppColors.textPrimary), maxLines: 1, overflow: TextOverflow.ellipsis),
+          ]),
+        ),
       ]),
     );
   }

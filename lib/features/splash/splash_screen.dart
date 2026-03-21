@@ -6,6 +6,7 @@ import '../../core/theme/app_colors.dart';
 import '../auth/providers/auth_provider.dart';
 import '../auth/screens/login_screen.dart';
 import '../../app_shell.dart';
+import '../../core/providers/app_state_provider.dart'; // Fixed import to avoid circular dependency
 
 class SplashScreen extends ConsumerStatefulWidget {
   const SplashScreen({super.key});
@@ -50,8 +51,7 @@ class _SplashScreenState extends ConsumerState<SplashScreen> with TickerProvider
       await Future.delayed(const Duration(seconds: 2));
       if (!mounted) return;
 
-      // Watch the auth state. If it's still loading, we might want to wait a bit longer,
-      // but for a splash screen, we can just read the current state.
+      // Watch the auth state
       final authState = ref.read(authStateChangesProvider);
       
       authState.when(
@@ -62,7 +62,7 @@ class _SplashScreenState extends ConsumerState<SplashScreen> with TickerProvider
             _goTo(const LoginScreen());
           }
         },
-        loading: () => _goTo(const LoginScreen()), // Default to login if taking too long
+        loading: () => _goTo(const LoginScreen()), // If still loading, default to Login
         error: (err, stack) {
           debugPrint('Auth Error in Splash: $err');
           _goTo(const LoginScreen());

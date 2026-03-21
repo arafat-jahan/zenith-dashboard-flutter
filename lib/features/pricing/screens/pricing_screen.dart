@@ -2,6 +2,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:lucide_icons/lucide_icons.dart';
+import 'package:responsive_framework/responsive_framework.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_text_styles.dart';
 import '../../../core/models/pricing_plan.dart';
@@ -17,6 +18,8 @@ class PricingScreen extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final billing = ref.watch(selectedBillingCycleProvider);
     final plansAsync = ref.watch(pricingPlansProvider);
+    final isMobile = ResponsiveBreakpoints.of(context).isMobile;
+    final hPadding = isMobile ? 16.0 : 24.0;
 
     return Scaffold(
       backgroundColor: AppColors.bgDeep,
@@ -25,7 +28,7 @@ class PricingScreen extends ConsumerWidget {
           // Header
           SliverToBoxAdapter(
             child: Padding(
-              padding: const EdgeInsets.fromLTRB(24, 28, 24, 36),
+              padding: EdgeInsets.fromLTRB(hPadding, 28, hPadding, 36),
               child: Column(children: [
                 GradientBadge(label: '🚀  Launch pricing — Save 17%', gradient: AppColors.violetGradient),
                 const SizedBox(height: 16),
@@ -51,7 +54,7 @@ class PricingScreen extends ConsumerWidget {
 
           // Pricing Grid
           SliverPadding(
-            padding: const EdgeInsets.fromLTRB(20, 0, 20, 40),
+            padding: EdgeInsets.fromLTRB(hPadding, 0, hPadding, 40),
             sliver: SliverGrid(
               gridDelegate: const SliverGridDelegateWithMaxCrossAxisExtent(
                 maxCrossAxisExtent: 400,

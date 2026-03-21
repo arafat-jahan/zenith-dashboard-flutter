@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:responsive_framework/responsive_framework.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../shared/widgets/base_shimmer.dart';
 import '../../../shared/widgets/staggered_entry.dart';
@@ -18,6 +19,8 @@ class DashboardScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final statsAsync = ref.watch(dashboardProvider);
+    final isMobile = ResponsiveBreakpoints.of(context).isMobile;
+    final hPadding = isMobile ? 16.0 : 24.0;
 
     return Scaffold(
       backgroundColor: AppColors.bgDeep,
@@ -30,15 +33,15 @@ class DashboardScreen extends ConsumerWidget {
           ),
 
           SliverPadding(
-            padding: const EdgeInsets.symmetric(horizontal: 24),
+            padding: EdgeInsets.symmetric(horizontal: hPadding),
             sliver: SliverToBoxAdapter(
               child: statsAsync.isLoading
-                ? const Row(
+                ? Row(
                   children:[
-                    Expanded(child: Padding(padding: EdgeInsets.only(right: 16), child: BaseShimmer(height: 110))),
-                    Expanded(child: Padding(padding: EdgeInsets.only(right: 16), child: BaseShimmer(height: 110))),
-                    Expanded(child: Padding(padding: EdgeInsets.only(right: 16), child: BaseShimmer(height: 110))),
-                    Expanded(child: Padding(padding: EdgeInsets.only(right: 16), child: BaseShimmer(height: 110))),
+                    Expanded(child: Padding(padding: const EdgeInsets.only(right: 16), child: BaseShimmer(height: 110))),
+                    Expanded(child: Padding(padding: const EdgeInsets.only(right: 16), child: BaseShimmer(height: 110))),
+                    Expanded(child: Padding(padding: const EdgeInsets.only(right: 16), child: BaseShimmer(height: 110))),
+                    Expanded(child: Padding(padding: const EdgeInsets.only(right: 16), child: BaseShimmer(height: 110))),
                   ],
                 )
                 : const StaggeredEntry(
@@ -49,7 +52,7 @@ class DashboardScreen extends ConsumerWidget {
           ),
 
           SliverPadding(
-            padding: const EdgeInsets.fromLTRB(24, 24, 24, 0),
+            padding: EdgeInsets.fromLTRB(hPadding, 24, hPadding, 0),
             sliver: SliverToBoxAdapter(
               child: LayoutBuilder(builder: (ctx, constraints) {
                 final content = constraints.maxWidth > 900
@@ -73,7 +76,7 @@ class DashboardScreen extends ConsumerWidget {
           ),
 
           SliverPadding(
-            padding: const EdgeInsets.fromLTRB(24, 24, 24, 40),
+            padding: EdgeInsets.fromLTRB(hPadding, 24, hPadding, 40),
             sliver: SliverToBoxAdapter(
               child: LayoutBuilder(builder: (ctx, constraints) {
                 final content = constraints.maxWidth > 900

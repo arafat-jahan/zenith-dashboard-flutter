@@ -2,6 +2,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:lucide_icons/lucide_icons.dart';
+import 'package:responsive_framework/responsive_framework.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_text_styles.dart';
 import '../../../shared/widgets/glass_card.dart';
@@ -16,6 +17,8 @@ class ApiKeysScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final keysAsync = ref.watch(apiKeysProvider);
+    final isMobile = ResponsiveBreakpoints.of(context).isMobile;
+    final hPadding = isMobile ? 16.0 : 24.0;
 
     return Scaffold(
       backgroundColor: AppColors.bgDeep,
@@ -23,23 +26,26 @@ class ApiKeysScreen extends ConsumerWidget {
         slivers: [
           SliverToBoxAdapter(
             child: Padding(
-              padding: const EdgeInsets.fromLTRB(24, 28, 24, 24),
+              padding: EdgeInsets.fromLTRB(hPadding, 28, hPadding, 24),
               child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
                 Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
-                  Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                    Text('API Keys', style: AppTextStyles.displayMedium),
-                    const SizedBox(height: 4),
-                    Text('Manage your access credentials', style: AppTextStyles.bodyLarge),
-                  ]),
+                  Expanded(
+                    child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                      Text('API Keys', style: AppTextStyles.displayMedium),
+                      const SizedBox(height: 4),
+                      Text('Manage your access credentials', style: AppTextStyles.bodyLarge),
+                    ]),
+                  ),
+                  const SizedBox(width: 12),
                   GlassCard(
                     padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
                     onTap: () {},
                     glowColor: AppColors.glowViolet,
                     borderColor: AppColors.accentViolet.withValues(alpha: 0.5),
-                    child: Row(children: [
+                    child: Row(mainAxisSize: MainAxisSize.min, children: [
                       const Icon(LucideIcons.plus, size: 16, color: Colors.white),
                       const SizedBox(width: 8),
-                      Text('Create new key', style: AppTextStyles.labelLarge.copyWith(color: Colors.white, fontWeight: FontWeight.w600)),
+                      Text(isMobile ? 'New' : 'Create new key', style: AppTextStyles.labelLarge.copyWith(color: Colors.white, fontWeight: FontWeight.w600)),
                     ]),
                   ),
                 ]),
@@ -56,14 +62,14 @@ class ApiKeysScreen extends ConsumerWidget {
           ),
 
           SliverPadding(
-            padding: const EdgeInsets.fromLTRB(20, 0, 20, 40),
+            padding: EdgeInsets.fromLTRB(hPadding, 0, hPadding, 40),
             sliver: keysAsync.when(
               data: (keys) => SliverGrid(
-                gridDelegate: const SliverGridDelegateWithMaxCrossAxisExtent(
+                gridDelegate: SliverGridDelegateWithMaxCrossAxisExtent(
                   maxCrossAxisExtent: 500,
                   mainAxisSpacing: 16,
                   crossAxisSpacing: 16,
-                  mainAxisExtent: 200,
+                  mainAxisExtent: isMobile ? 220 : 200,
                 ),
                 delegate: SliverChildBuilderDelegate(
                   (ctx, i) => ApiKeyCard(credential: keys[i]),
@@ -71,11 +77,11 @@ class ApiKeysScreen extends ConsumerWidget {
                 ),
               ),
               loading: () => SliverGrid(
-                gridDelegate: const SliverGridDelegateWithMaxCrossAxisExtent(
+                gridDelegate: SliverGridDelegateWithMaxCrossAxisExtent(
                   maxCrossAxisExtent: 500,
                   mainAxisSpacing: 16,
                   crossAxisSpacing: 16,
-                  mainAxisExtent: 200,
+                  mainAxisExtent: isMobile ? 220 : 200,
                 ),
                 delegate: SliverChildBuilderDelegate(
                   (ctx, i) => const BaseShimmer(height: 200),

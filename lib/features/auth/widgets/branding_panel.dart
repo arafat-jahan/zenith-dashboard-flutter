@@ -8,7 +8,8 @@ import '../../../shared/widgets/glass_card.dart';
 import '../../../shared/widgets/gradient_badge.dart';
 
 class BrandingPanel extends StatefulWidget {
-  const BrandingPanel({super.key});
+  final bool isMini;
+  const BrandingPanel({super.key, this.isMini = false});
 
   @override
   State<BrandingPanel> createState() => _BrandingPanelState();
@@ -47,6 +48,22 @@ class _BrandingPanelState extends State<BrandingPanel> with SingleTickerProvider
 
   @override
   Widget build(BuildContext context) {
+    if (widget.isMini) {
+      return Row(mainAxisSize: MainAxisSize.min, children: [
+        Container(
+          width: 32, height: 32,
+          decoration: BoxDecoration(
+            gradient: AppColors.violetGradient,
+            borderRadius: BorderRadius.circular(8),
+            boxShadow: const [BoxShadow(color: AppColors.glowViolet, blurRadius: 12)],
+          ),
+          child: const Icon(LucideIcons.zap, color: Colors.white, size: 18),
+        ),
+        const SizedBox(width: 12),
+        Text('Zenith AI', style: AppTextStyles.headlineLarge),
+      ]);
+    }
+
     return Container(
       decoration: const BoxDecoration(
         gradient: LinearGradient(

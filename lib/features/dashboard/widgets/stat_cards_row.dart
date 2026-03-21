@@ -63,8 +63,8 @@ class StatCardsRow extends ConsumerWidget {
       
       final width = constraints.maxWidth;
       final childWidth = (width - 16) / 2; // 2 columns
-      // INCREASED HEIGHT: Fixed overflow by increasing base height from 120 to 140
-      final childHeight = 140.0; 
+      // INCREASED HEIGHT: Fixed overflow by increasing base height from 140 to 160
+      final childHeight = 160.0; 
       final adaptiveRatio = childWidth / childHeight;
 
       return GridView.count(

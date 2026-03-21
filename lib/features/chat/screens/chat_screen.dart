@@ -2,6 +2,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:lucide_icons/lucide_icons.dart';
+import 'package:responsive_framework/responsive_framework.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_text_styles.dart';
 import '../../../shared/widgets/glass_card.dart';
@@ -54,50 +55,41 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
   @override
   Widget build(BuildContext context) {
     final chat = ref.watch(chatProvider);
+    final isMobile = ResponsiveBreakpoints.of(context).isMobile;
+    final hPadding = isMobile ? 16.0 : 24.0;
 
     return Scaffold(
       backgroundColor: AppColors.bgDeep,
       body: Column(children: [
         // Header
         Container(
-          padding: const EdgeInsets.fromLTRB(24, 28, 20, 16),
+          padding: EdgeInsets.fromLTRB(hPadding, 28, hPadding, 16),
           decoration: const BoxDecoration(
             border: Border(bottom: BorderSide(color: AppColors.glassBorder)),
           ),
-          child: Row(children: [
-            Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-              Text('AI Playground', style: AppTextStyles.displayMedium),
-              const SizedBox(height: 4),
-              Text('Chat with our frontier models', style: AppTextStyles.bodyLarge),
-            ])),
-            GlassCard(
-              padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
-              child: DropdownButtonHideUnderline(
-                child: DropdownButton<String>(
-                  value: chat.selectedModel,
-                  dropdownColor: AppColors.bgElevated,
-                  icon: const Padding(
-                    padding: EdgeInsets.only(left: 8),
-                    child: Icon(LucideIcons.chevronDown, size: 14, color: AppColors.textMuted),
+          child: isMobile 
+            ? Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text('AI Playground', style: AppTextStyles.displayMedium),
+                      _HeaderActions(chat: chat, onClear: () => ref.read(chatProvider.notifier).clearChat()),
+                    ],
                   ),
-                  items: ['zenith-ultra','zenith-pro','zenith-flash','zenith-nano']
-                      .map((m) => DropdownMenuItem(
-                    value: m,
-                    child: Text(m, style: AppTextStyles.bodyMedium.copyWith(color: AppColors.textPrimary)),
-                  ))
-                      .toList(),
-                  onChanged: (v) { if (v != null) ref.read(chatProvider.notifier).changeModel(v); },
-                  style: AppTextStyles.bodyMedium.copyWith(color: AppColors.textPrimary),
-                ),
-              ),
-            ),
-            const SizedBox(width: 10),
-            GlassCard(
-              padding: const EdgeInsets.all(10),
-              onTap: () => ref.read(chatProvider.notifier).clearChat(),
-              child: const Icon(LucideIcons.trash2, size: 16, color: AppColors.textMuted),
-            ),
-          ]),
+                  const SizedBox(height: 8),
+                  Text('Chat with our frontier models', style: AppTextStyles.bodyLarge),
+                ],
+              )
+            : Row(children: [
+                Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                  Text('AI Playground', style: AppTextStyles.displayMedium),
+                  const SizedBox(height: 4),
+                  Text('Chat with our frontier models', style: AppTextStyles.bodyLarge),
+                ])),
+                _HeaderActions(chat: chat, onClear: () => ref.read(chatProvider.notifier).clearChat()),
+              ]),
         ),
 
         // Messages
@@ -106,7 +98,7 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
               ? EmptyState(selectedModel: chat.selectedModel, onSuggestionTapped: _sendSuggestion)
               : ListView.builder(
                   controller: _scrollController,
-                  padding: const EdgeInsets.fromLTRB(20, 8, 20, 8),
+                  padding: EdgeInsets.fromLTRB(hPadding, 8, hPadding, 8),
                   itemCount: chat.messages.length + (chat.isTyping || chat.streamingText.isNotEmpty ? 1 : 0),
                   itemBuilder: (_, i) {
                     if (i == chat.messages.length) {
@@ -129,8 +121,57 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
         ),
 
         // Input Bar
-        ChatInputBar(controller: _controller, onSend: _sendMessage, isTyping: chat.isTyping || chat.streamingText.isNotEmpty),
+        Padding(
+          padding: EdgeInsets.fromLTRB(hPadding, 0, hPadding, 20),
+          child: ChatInputBar(
+            controller: _controller,
+            onSend: _sendMessage,
+            isTyping: chat.isTyping,
+          ),
+        ),
       ]),
+    );
+  }
+}
+
+class _HeaderActions extends ConsumerWidget {
+  final dynamic chat;
+  final VoidCallback onClear;
+  const _HeaderActions({required this.chat, required this.onClear});
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        GlassCard(
+          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+          child: DropdownButtonHideUnderline(
+            child: DropdownButton<String>(
+              value: chat.selectedModel,
+              dropdownColor: AppColors.bgElevated,
+              icon: const Padding(
+                padding: EdgeInsets.only(left: 8),
+                child: Icon(LucideIcons.chevronDown, size: 14, color: AppColors.textMuted),
+              ),
+              items: ['zenith-ultra','zenith-pro','zenith-flash','zenith-nano']
+                  .map((m) => DropdownMenuItem(
+                value: m,
+                child: Text(m, style: AppTextStyles.bodyMedium.copyWith(color: AppColors.textPrimary)),
+              ))
+                  .toList(),
+              onChanged: (v) { if (v != null) ref.read(chatProvider.notifier).changeModel(v); },
+              style: AppTextStyles.bodyMedium.copyWith(color: AppColors.textPrimary),
+            ),
+          ),
+        ),
+        const SizedBox(width: 10),
+        GlassCard(
+          padding: const EdgeInsets.all(10),
+          onTap: onClear,
+          child: const Icon(LucideIcons.trash2, size: 16, color: AppColors.textMuted),
+        ),
+      ],
     );
   }
 }

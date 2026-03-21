@@ -1,6 +1,6 @@
-// lib/features/analytics/screens/analytics_screen.dart
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:responsive_framework/responsive_framework.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_text_styles.dart';
 import '../../../shared/widgets/gradient_badge.dart';
@@ -14,6 +14,8 @@ class AnalyticsScreen extends ConsumerWidget { // Convert to ConsumerWidget
   @override
   Widget build(BuildContext context, WidgetRef ref) { // Add ref
     final statsAsync = ref.watch(dashboardProvider); // Watch provider
+    final isMobile = ResponsiveBreakpoints.of(context).isMobile;
+    final hPadding = isMobile ? 16.0 : 24.0;
     
     return Scaffold(
       backgroundColor: AppColors.bgDeep,
@@ -22,24 +24,39 @@ class AnalyticsScreen extends ConsumerWidget { // Convert to ConsumerWidget
           // Header - 24px sides, 32px top
           SliverToBoxAdapter(
             child: Padding(
-              padding: const EdgeInsets.fromLTRB(24, 32, 24, 24),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                    Text('Analytics', style: AppTextStyles.displayMedium),
-                    const SizedBox(height: 4),
-                    Text('Deep dive into your platform metrics', style: AppTextStyles.bodyLarge),
-                  ]),
-                  const GradientBadge(label: 'Last 30 days', gradient: AppColors.blueGradient),
-                ],
-              ),
+              padding: EdgeInsets.fromLTRB(hPadding, 32, hPadding, 24),
+              child: isMobile 
+                ? Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Text('Analytics', style: AppTextStyles.displayMedium),
+                          const GradientBadge(label: 'Last 30 days', gradient: AppColors.blueGradient),
+                        ],
+                      ),
+                      const SizedBox(height: 8),
+                      Text('Deep dive into your platform metrics', style: AppTextStyles.bodyLarge),
+                    ],
+                  )
+                : Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                        Text('Analytics', style: AppTextStyles.displayMedium),
+                        const SizedBox(height: 4),
+                        Text('Deep dive into your platform metrics', style: AppTextStyles.bodyLarge),
+                      ]),
+                      const GradientBadge(label: 'Last 30 days', gradient: AppColors.blueGradient),
+                    ],
+                  ),
             ),
           ),
 
           // Top KPI row - 24px horizontal, 16px gap
           SliverPadding(
-            padding: const EdgeInsets.fromLTRB(24, 0, 24, 16),
+            padding: EdgeInsets.fromLTRB(hPadding, 0, hPadding, 16),
             sliver: SliverToBoxAdapter(
               child: StaggeredEntry(
                 delay: 0,
@@ -69,7 +86,7 @@ class AnalyticsScreen extends ConsumerWidget { // Convert to ConsumerWidget
 
           // Charts row - 24px sides, 24px vertical gap
           SliverPadding(
-            padding: const EdgeInsets.fromLTRB(24, 8, 24, 24),
+            padding: EdgeInsets.fromLTRB(hPadding, 8, hPadding, 24),
             sliver: SliverToBoxAdapter(
               child: StaggeredEntry(
                 delay: 150,
@@ -99,7 +116,7 @@ class AnalyticsScreen extends ConsumerWidget { // Convert to ConsumerWidget
 
           // Bottom row
           SliverPadding(
-            padding: const EdgeInsets.fromLTRB(24, 0, 24, 40),
+            padding: EdgeInsets.fromLTRB(hPadding, 0, hPadding, 40),
             sliver: SliverToBoxAdapter(
               child: StaggeredEntry(
                 delay: 300,

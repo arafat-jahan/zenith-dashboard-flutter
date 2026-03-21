@@ -41,9 +41,13 @@ class EmptyState extends StatelessWidget {
               spacing: 10, runSpacing: 10, alignment: WrapAlignment.center,
               children: AppStrings.chatSuggestions.map((s) => GlassCard(
                 onTap: () => onSuggestionTapped(s),
-                padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 9),
+                padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
                 borderRadius: 100,
-                child: Text(s, style: AppTextStyles.bodySmall.copyWith(color: AppColors.textSecondary)),
+                child: Text(
+                  s, 
+                  style: AppTextStyles.bodySmall.copyWith(color: AppColors.textSecondary),
+                  textAlign: TextAlign.center,
+                ),
               )).toList(),
             ),
           ],

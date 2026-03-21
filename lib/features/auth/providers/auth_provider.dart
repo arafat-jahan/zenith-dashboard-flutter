@@ -6,7 +6,7 @@ import 'package:ui_kit/core/models/user_model.dart';
 import 'package:ui_kit/core/repositories/implementations/firebase_auth_repository.dart';
 import 'package:ui_kit/core/repositories/implementations/mock_auth_repository.dart';
 import 'package:ui_kit/core/repositories/interfaces/i_auth_repository.dart';
-import 'package:ui_kit/main.dart'; // To access isMockModeProvider
+import 'package:ui_kit/core/providers/app_state_provider.dart'; // Fixed import to avoid circular dependency
 
 final authRepositoryProvider = Provider<IAuthRepository>((ref) {
   // Use the global mock mode flag provided by main.dart

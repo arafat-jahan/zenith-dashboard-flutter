@@ -1,6 +1,7 @@
 // lib/features/settings/screens/settings_screen.dart
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:responsive_framework/responsive_framework.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_text_styles.dart';
 import '../../../shared/widgets/staggered_entry.dart';
@@ -11,13 +12,16 @@ class SettingsScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final isMobile = ResponsiveBreakpoints.of(context).isMobile;
+    final hPadding = isMobile ? 16.0 : 24.0;
+
     return Scaffold(
       backgroundColor: AppColors.bgDeep,
       body: CustomScrollView(
         slivers: [
           SliverToBoxAdapter(
             child: Padding(
-              padding: const EdgeInsets.fromLTRB(24, 32, 24, 24),
+              padding: EdgeInsets.fromLTRB(hPadding, 32, hPadding, 24),
               child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
                 Text('Settings', style: AppTextStyles.displayMedium),
                 const SizedBox(height: 4),
@@ -27,7 +31,7 @@ class SettingsScreen extends ConsumerWidget {
           ),
 
           SliverPadding(
-            padding: const EdgeInsets.fromLTRB(24, 0, 24, 40),
+            padding: EdgeInsets.fromLTRB(hPadding, 0, hPadding, 40),
             sliver: SliverToBoxAdapter(
               child: LayoutBuilder(builder: (ctx, c) {
                 final content = c.maxWidth > 800

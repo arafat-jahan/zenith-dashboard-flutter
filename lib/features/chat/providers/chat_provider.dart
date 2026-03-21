@@ -7,7 +7,7 @@ import '../../../core/repositories/implementations/mock_chat_repository.dart';
 import '../../../core/repositories/interfaces/i_chat_repository.dart';
 import '../../auth/providers/auth_provider.dart';
 import '../models/chat_message.dart';
-import '../../../main.dart'; // To access isMockModeProvider
+import '../../../core/providers/app_state_provider.dart'; // Fixed import to avoid circular dependency
 
 final chatRepositoryProvider = Provider<IChatRepository>((ref) {
   final isMock = ref.watch(isMockModeProvider);
