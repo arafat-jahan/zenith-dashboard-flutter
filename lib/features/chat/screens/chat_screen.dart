@@ -6,7 +6,6 @@ import 'package:responsive_framework/responsive_framework.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_text_styles.dart';
 import '../../../shared/widgets/glass_card.dart';
-
 import '../providers/chat_provider.dart';
 import '../models/chat_message.dart';
 import '../widgets/widgets.dart';
@@ -67,57 +66,65 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
           decoration: const BoxDecoration(
             border: Border(bottom: BorderSide(color: AppColors.glassBorder)),
           ),
-          child: isMobile 
-            ? Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
                 children: [
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Text('AI Playground', style: AppTextStyles.displayMedium),
-                      _HeaderActions(chat: chat, onClear: () => ref.read(chatProvider.notifier).clearChat()),
-                    ],
+                  Expanded(
+                    child: Text(
+                      'AI Playground',
+                      style: AppTextStyles.displayMedium,
+                      overflow: TextOverflow.ellipsis,
+                      maxLines: 1,
+                    ),
                   ),
-                  const SizedBox(height: 8),
-                  Text('Chat with our frontier models', style: AppTextStyles.bodyLarge),
+                  const SizedBox(width: 12),
+                  _HeaderActions(
+                    chat: chat,
+                    onClear: () => ref.read(chatProvider.notifier).clearChat(),
+                  ),
                 ],
-              )
-            : Row(children: [
-                Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                  Text('AI Playground', style: AppTextStyles.displayMedium),
-                  const SizedBox(height: 4),
-                  Text('Chat with our frontier models', style: AppTextStyles.bodyLarge),
-                ])),
-                _HeaderActions(chat: chat, onClear: () => ref.read(chatProvider.notifier).clearChat()),
-              ]),
+              ),
+              const SizedBox(height: 4),
+              Text(
+                'Chat with our frontier models',
+                style: AppTextStyles.bodyLarge,
+              ),
+            ],
+          ),
         ),
 
         // Messages
         Expanded(
           child: chat.messages.isEmpty && chat.streamingText.isEmpty
-              ? EmptyState(selectedModel: chat.selectedModel, onSuggestionTapped: _sendSuggestion)
+              ? EmptyState(
+            selectedModel: chat.selectedModel,
+            onSuggestionTapped: _sendSuggestion,
+          )
               : ListView.builder(
-                  controller: _scrollController,
-                  padding: EdgeInsets.fromLTRB(hPadding, 8, hPadding, 8),
-                  itemCount: chat.messages.length + (chat.isTyping || chat.streamingText.isNotEmpty ? 1 : 0),
-                  itemBuilder: (_, i) {
-                    if (i == chat.messages.length) {
-                      if (chat.streamingText.isNotEmpty) {
-                        return MessageBubble(
-                          message: ChatMessage(
-                            text: chat.streamingText,
-                            isUser: false,
-                            timestamp: DateTime.now(),
-                          ),
-                          isStreaming: true,
-                          isError: chat.hasStreamingError,
-                        );
-                      }
-                      return const TypingIndicator();
-                    }
-                    return MessageBubble(message: chat.messages[i]);
-                  },
-                ),
+            controller: _scrollController,
+            padding: EdgeInsets.fromLTRB(hPadding, 8, hPadding, 8),
+            itemCount: chat.messages.length +
+                (chat.isTyping || chat.streamingText.isNotEmpty ? 1 : 0),
+            itemBuilder: (_, i) {
+              if (i == chat.messages.length) {
+                if (chat.streamingText.isNotEmpty) {
+                  return MessageBubble(
+                    message: ChatMessage(
+                      text: chat.streamingText,
+                      isUser: false,
+                      timestamp: DateTime.now(),
+                    ),
+                    isStreaming: true,
+                    isError: chat.hasStreamingError,
+                  );
+                }
+                return const TypingIndicator();
+              }
+              return MessageBubble(message: chat.messages[i]);
+            },
+          ),
         ),
 
         // Input Bar
@@ -144,28 +151,46 @@ class _HeaderActions extends ConsumerWidget {
     return Row(
       mainAxisSize: MainAxisSize.min,
       children: [
-        GlassCard(
-          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
-          child: DropdownButtonHideUnderline(
-            child: DropdownButton<String>(
-              value: chat.selectedModel,
-              dropdownColor: AppColors.bgElevated,
-              icon: const Padding(
-                padding: EdgeInsets.only(left: 8),
-                child: Icon(LucideIcons.chevronDown, size: 14, color: AppColors.textMuted),
+        ConstrainedBox(
+          constraints: const BoxConstraints(maxWidth: 160),
+          child: GlassCard(
+            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+            child: DropdownButtonHideUnderline(
+              child: DropdownButton<String>(
+                value: chat.selectedModel,
+                dropdownColor: AppColors.bgElevated,
+                isExpanded: true,
+                icon: const Padding(
+                  padding: EdgeInsets.only(left: 6),
+                  child: Icon(
+                    LucideIcons.chevronDown,
+                    size: 14,
+                    color: AppColors.textMuted,
+                  ),
+                ),
+                items: ['zenith-ultra', 'zenith-pro', 'zenith-flash', 'zenith-nano']
+                    .map((m) => DropdownMenuItem(
+                  value: m,
+                  child: Text(
+                    m,
+                    style: AppTextStyles.bodyMedium.copyWith(
+                      color: AppColors.textPrimary,
+                    ),
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ))
+                    .toList(),
+                onChanged: (v) {
+                  if (v != null) ref.read(chatProvider.notifier).changeModel(v);
+                },
+                style: AppTextStyles.bodyMedium.copyWith(
+                  color: AppColors.textPrimary,
+                ),
               ),
-              items: ['zenith-ultra','zenith-pro','zenith-flash','zenith-nano']
-                  .map((m) => DropdownMenuItem(
-                value: m,
-                child: Text(m, style: AppTextStyles.bodyMedium.copyWith(color: AppColors.textPrimary)),
-              ))
-                  .toList(),
-              onChanged: (v) { if (v != null) ref.read(chatProvider.notifier).changeModel(v); },
-              style: AppTextStyles.bodyMedium.copyWith(color: AppColors.textPrimary),
             ),
           ),
         ),
-        const SizedBox(width: 10),
+        const SizedBox(width: 8),
         GlassCard(
           padding: const EdgeInsets.all(10),
           onTap: onClear,

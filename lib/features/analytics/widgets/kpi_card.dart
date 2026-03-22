@@ -14,23 +14,43 @@ class KpiCard extends StatelessWidget {
     return GlassCard(
       glowColor: color.withValues(alpha: 0.3),
       glowRadius: 20,
+      padding: const EdgeInsets.all(16),
       child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-        Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
-          Text(title, style: AppTextStyles.bodySmall),
-          Container(
-            padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 3),
-            decoration: BoxDecoration(
-              color: (isPos ? AppColors.accentGreen : AppColors.accentRose).withValues(alpha: 0.12),
-              borderRadius: BorderRadius.circular(6),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Flexible(
+              child: Text(
+                title,
+                style: AppTextStyles.bodySmall,
+                overflow: TextOverflow.ellipsis,
+                maxLines: 1,
+              ),
             ),
-            child: Text(change, style: AppTextStyles.labelSmall.copyWith(
-              color: isPos ? AppColors.accentGreen : AppColors.accentRose,
-              fontWeight: FontWeight.w700,
-            )),
-          ),
-        ]),
+            const SizedBox(width: 6),
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 3),
+              decoration: BoxDecoration(
+                color: (isPos ? AppColors.accentGreen : AppColors.accentRose).withValues(alpha: 0.12),
+                borderRadius: BorderRadius.circular(6),
+              ),
+              child: Text(
+                change,
+                style: AppTextStyles.labelSmall.copyWith(
+                  color: isPos ? AppColors.accentGreen : AppColors.accentRose,
+                  fontWeight: FontWeight.w700,
+                ),
+              ),
+            ),
+          ],
+        ),
         const SizedBox(height: 10),
-        Text(value, style: AppTextStyles.metricLarge.copyWith(color: color)),
+        Text(
+          value,
+          style: AppTextStyles.metricLarge.copyWith(color: color),
+          overflow: TextOverflow.ellipsis,
+          maxLines: 1,
+        ),
       ]),
     );
   }
