@@ -217,6 +217,5 @@ Full guide in [`WHITE_LABELING_GUIDE.md`](./WHITE_LABELING_GUIDE.md)
 
 <img src="https://capsule-render.vercel.app/api?type=waving&color=6366f1,a855f7,06b6d4&height=100&section=footer" width="100%"/>
 
-<sub>Built by <a href="https://github.com/yourusername">Your Name</a></sub>
 
 </div>
