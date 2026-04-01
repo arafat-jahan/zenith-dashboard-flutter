@@ -132,4 +132,4 @@ All brand-facing strings (app name, support email, website, social links, system
 
 ---
 
-Built by [Your Name](https://github.com/yourusername)
+Built by [Your Name](https://github.com/arafat-jahan)
