@@ -7,6 +7,7 @@ import '../../core/theme/app_text_styles.dart';
 import '../../core/providers/nav_provider.dart';
 import '../../core/providers/nav_config.dart';
 import '../../core/constants/app_strings.dart';
+import '../../features/auth/providers/auth_provider.dart';
 
 class AppSidebarFull extends ConsumerWidget {
   const AppSidebarFull({super.key});
@@ -14,6 +15,7 @@ class AppSidebarFull extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final selected = ref.watch(selectedNavIndexProvider);
+    final user = ref.watch(userProfileProvider).value;
 
     return Container(
       width: 240, // Standard width for 8-point grid
@@ -48,7 +50,7 @@ class AppSidebarFull extends ConsumerWidget {
 
                 // Platform Section
                 _SectionHeader(title: AppStrings.navPlatform),
-                ...NavConfig.platformItems.asMap().entries.map((entry) => _Item(
+                ...NavConfig.getPlatformItems(user).asMap().entries.map((entry) => _Item(
                   item: entry.value,
                   index: entry.key,
                   selected: selected,
@@ -61,7 +63,7 @@ class AppSidebarFull extends ConsumerWidget {
                 // Account Section
                 _SectionHeader(title: AppStrings.navAccount),
                 ...NavConfig.accountItems.asMap().entries.map((entry) {
-                  final index = NavConfig.platformItems.length + entry.key;
+                  final index = NavConfig.getPlatformItems(user).length + entry.key;
                   return _Item(
                     item: entry.value,
                     index: index,

@@ -136,6 +136,9 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
             isTyping: chat.isTyping,
           ),
         ),
+
+        // Paywall Overlay
+        const PaywallOverlay(),
       ]),
     );
   }

@@ -6,5 +6,9 @@ abstract class IAuthRepository {
   Future<UserModel?> getUserProfile(String uid);
   Future<void> login(String email, String password);
   Future<void> register(String email, String password, String name);
+  Future<void> signInWithGoogle();
+  Future<void> signInWithApple();
+  Future<void> sendEmailVerification();
+  Future<bool> isEmailVerified();
   Future<void> logout();
 }

@@ -51,6 +51,11 @@ class AppTextStyles {
     color: AppColors.textSecondary, letterSpacing: 0.3,
   );
 
+  static TextStyle get labelMedium => GoogleFonts.inter(
+    fontSize: 12, fontWeight: FontWeight.w500,
+    color: AppColors.textSecondary, letterSpacing: 0.2,
+  );
+
   static TextStyle get labelSmall => GoogleFonts.inter(
     fontSize: 10, fontWeight: FontWeight.w500,
     color: AppColors.textMuted, letterSpacing: 0.8,

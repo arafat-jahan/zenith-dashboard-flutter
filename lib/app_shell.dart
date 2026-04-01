@@ -6,6 +6,7 @@ import 'core/providers/nav_provider.dart';
 import 'core/providers/nav_config.dart';
 import 'core/theme/app_colors.dart';
 import 'core/theme/app_text_styles.dart';
+import 'features/auth/providers/auth_provider.dart';
 import 'shared/widgets/app_sidebar.dart';
 
 class AppShell extends ConsumerWidget {
@@ -14,7 +15,8 @@ class AppShell extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final index = ref.watch(selectedNavIndexProvider);
-    final allItems = NavConfig.allItems;
+    final user = ref.watch(userProfileProvider).value;
+    final allItems = NavConfig.getAllItems(user);
     final isWide = MediaQuery.of(context).size.width > 900;
     final currentScreen = allItems[index.clamp(0, allItems.length - 1)].screen;
 
@@ -106,15 +108,16 @@ class AppShell extends ConsumerWidget {
   }
 }
 
-class _MobileNav extends StatelessWidget {
+class _MobileNav extends ConsumerWidget {
   final int currentIndex;
   final ValueChanged<int> onTap;
   const _MobileNav({required this.currentIndex, required this.onTap});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final user = ref.watch(userProfileProvider).value;
     // প্রথম ৪টা item + More
-    final mainItems = NavConfig.platformItems.take(4).toList();
+    final mainItems = NavConfig.getPlatformItems(user).take(4).toList();
 
     return Container(
       decoration: const BoxDecoration(

@@ -7,6 +7,8 @@ import '../../features/api_keys/screens/api_keys_screen.dart';
 import '../../features/notifications/screens/notifications_screen.dart';
 import '../../features/pricing/screens/pricing_screen.dart';
 import '../../features/settings/screens/settings_screen.dart';
+import '../../features/admin/screens/admin_dashboard_screen.dart';
+import '../../core/models/user_model.dart';
 
 class NavItem {
   final String label;
@@ -23,18 +25,27 @@ class NavItem {
 }
 
 class NavConfig {
-  static final List<NavItem> platformItems = [
-    const NavItem(label: 'Dashboard', icon: LucideIcons.layout, screen: DashboardScreen()),
-    const NavItem(label: 'AI Playground', icon: LucideIcons.bot, screen: ChatScreen()),
-    const NavItem(label: 'Analytics', icon: LucideIcons.barChart, screen: AnalyticsScreen()),
-    const NavItem(label: 'API Keys', icon: LucideIcons.key, screen: ApiKeysScreen()),
-    const NavItem(label: 'Notifications', icon: LucideIcons.bell, screen: NotificationsScreen()),
-    const NavItem(label: 'Pricing', icon: LucideIcons.creditCard, screen: PricingScreen()),
-  ];
+  static List<NavItem> getPlatformItems(UserModel? user) {
+    final items = [
+      const NavItem(label: 'Dashboard', icon: LucideIcons.layout, screen: DashboardScreen()),
+      const NavItem(label: 'AI Playground', icon: LucideIcons.bot, screen: ChatScreen()),
+      const NavItem(label: 'Analytics', icon: LucideIcons.barChart, screen: AnalyticsScreen()),
+      const NavItem(label: 'API Keys', icon: LucideIcons.key, screen: ApiKeysScreen()),
+      const NavItem(label: 'Notifications', icon: LucideIcons.bell, screen: NotificationsScreen()),
+      const NavItem(label: 'Pricing', icon: LucideIcons.creditCard, screen: PricingScreen()),
+    ];
+
+    // Add admin dashboard only for admin users
+    if (user?.role == 'admin') {
+      items.insert(1, const NavItem(label: 'Admin', icon: LucideIcons.shield, screen: AdminDashboardScreen()));
+    }
+
+    return items;
+  }
 
   static final List<NavItem> accountItems = [
     const NavItem(label: 'Settings', icon: LucideIcons.settings, screen: SettingsScreen(), isAccount: true),
   ];
 
-  static List<NavItem> get allItems => [...platformItems, ...accountItems];
+  static List<NavItem> getAllItems(UserModel? user) => [...getPlatformItems(user), ...accountItems];
 }

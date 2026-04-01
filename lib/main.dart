@@ -2,37 +2,25 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:responsive_framework/responsive_framework.dart';
 import 'package:firebase_core/firebase_core.dart';
-import 'core/providers/app_state_provider.dart';
 import 'core/theme/app_theme.dart';
 import 'core/providers/provider_logger.dart';
 import 'features/splash/splash_screen.dart';
+import 'features/pricing/screens/success_screen.dart';
+import 'features/pricing/screens/payment_verification_screen.dart';
+import 'features/pricing/screens/success_manual_update_screen.dart';
+import 'core/config/app_config.dart';
 import 'firebase_options.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
-  // Initialize Firebase
-  bool firebaseFailed = false;
-  try {
-    final apiKey = DefaultFirebaseOptions.currentPlatform.apiKey;
-    if (apiKey.isEmpty || apiKey == "null") {
-      firebaseFailed = true;
-      debugPrint("Firebase API Key is missing. Using Mock Mode.");
-    } else {
-      await Firebase.initializeApp(
-        options: DefaultFirebaseOptions.currentPlatform,
-      ).timeout(const Duration(seconds: 5));
-    }
-  } catch (e) {
-    debugPrint("Firebase initialization failed: $e");
-    firebaseFailed = true;
-  }
+  // Initialize Firebase - Force initialization
+  await Firebase.initializeApp(
+    options: DefaultFirebaseOptions.currentPlatform,
+  );
 
   runApp(ProviderScope(
     observers: [ProviderLogger()],
-    overrides: [
-      isMockModeProvider.overrideWith((ref) => firebaseFailed),
-    ],
     child: const ZenithApp(),
   ));
 }
@@ -52,10 +40,18 @@ class ZenithApp extends StatelessWidget {
           const Breakpoint(start: 1921, end: double.infinity, name: '4K'),
         ],
       ),
-      title: 'Zenith AI — Dashboard',
+      title: '${AppConfig.appName} — Dashboard',
       debugShowCheckedModeBanner: false,
       theme: AppTheme.darkTheme,
       home: const SplashScreen(),
+      routes: {
+        '/success': (context) {
+          final args = ModalRoute.of(context)?.settings.arguments;
+          return SuccessScreen(sessionId: args is String ? args : null);
+        },
+        '/payment-verification': (context) => const PaymentVerificationScreen(),
+        '/success-manual': (context) => const SuccessManualUpdateScreen(),
+      },
     );
   }
 }

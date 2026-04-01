@@ -22,6 +22,8 @@ class MockAuthRepository implements IAuthRepository {
       name: 'Demo User',
       plan: 'pro',
       tokenUsage: 42,
+      credits: 100,
+      role: 'user',
       createdAt: DateTime.now(),
     );
   }
@@ -35,6 +37,29 @@ class MockAuthRepository implements IAuthRepository {
   @override
   Future<void> register(String email, String password, String name) async {
     _controller.add(null);
+  }
+
+  @override
+  Future<void> signInWithGoogle() async {
+    // Mock Google Sign-In
+    _controller.add(null);
+  }
+
+  @override
+  Future<void> signInWithApple() async {
+    // Mock Apple Sign-In
+    _controller.add(null);
+  }
+
+  @override
+  Future<void> sendEmailVerification() async {
+    // Mock email verification
+  }
+
+  @override
+  Future<bool> isEmailVerified() async {
+    // Mock email verified
+    return true;
   }
 
   @override

@@ -8,6 +8,8 @@ class UserModel {
   final String? photoUrl;
   final String plan; // 'free', 'pro', 'enterprise'
   final int tokenUsage;
+  final int credits; // Business logic credits
+  final String role; // 'user', 'admin'
   final DateTime? createdAt;
 
   UserModel({
@@ -17,6 +19,8 @@ class UserModel {
     this.photoUrl,
     required this.plan,
     required this.tokenUsage,
+    this.credits = 5,
+    this.role = 'user',
     this.createdAt,
   });
 
@@ -28,6 +32,8 @@ class UserModel {
       photoUrl: map['photoUrl'],
       plan: map['plan'] ?? 'free',
       tokenUsage: map['tokenUsage'] ?? 0,
+      credits: map['credits'] ?? 5,
+      role: map['role'] ?? 'user',
       createdAt: (map['createdAt'] as Timestamp?)?.toDate(),
     );
   }
@@ -39,6 +45,8 @@ class UserModel {
       'photoUrl': photoUrl,
       'plan': plan,
       'tokenUsage': tokenUsage,
+      'credits': credits,
+      'role': role,
       'createdAt': createdAt != null ? Timestamp.fromDate(createdAt!) : FieldValue.serverTimestamp(),
     };
   }
@@ -48,6 +56,8 @@ class UserModel {
     String? photoUrl,
     String? plan,
     int? tokenUsage,
+    int? credits,
+    String? role,
   }) {
     return UserModel(
       id: id,
@@ -56,6 +66,8 @@ class UserModel {
       photoUrl: photoUrl ?? this.photoUrl,
       plan: plan ?? this.plan,
       tokenUsage: tokenUsage ?? this.tokenUsage,
+      credits: credits ?? this.credits,
+      role: role ?? this.role,
       createdAt: createdAt,
     );
   }

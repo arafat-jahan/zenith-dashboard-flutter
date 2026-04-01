@@ -1,12 +1,13 @@
 // lib/core/constants/app_strings.dart
+import '../config/app_config.dart';
 
 class AppStrings {
-  // App Branding
-  static const String appName = 'Zenith AI';
-  static const String appTagline = 'The AI platform that scales with your ambition.';
-  static const String appDescription = 'Build, deploy, and monitor AI models with enterprise-grade infrastructure.';
+  // App Branding (Using AppConfig for white-labeling)
+  static const String appName = AppConfig.appName;
+  static const String appTagline = AppConfig.tagline;
+  static const String appDescription = AppConfig.appDescription;
   static const String trustedBy = 'Trusted by 24,000+ developers';
-  static const String testimonialText = '"Zenith cut our inference costs by 60% while doubling throughput. Absolute game changer."';
+  static const String testimonialText = '"${AppConfig.appName} cut our inference costs by 60% while doubling throughput. Absolute game changer."';
   static const String testimonialAuthor = 'Sarah Kim';
   static const String testimonialAuthorRole = 'CTO at NovaTech';
 
@@ -32,7 +33,7 @@ class AppStrings {
   // Chat Screen
   static const String chatHeaderTitle = 'AI Playground';
   static const String chatHeaderSubtitle = 'Chat with our frontier models';
-  static const String chatInputHint = 'Message Zenith AI…';
+  static const String chatInputHint = 'Message ${AppConfig.appName}…';
   static const String chatEmptyStateTitle = 'Start a conversation';
   static const String chatEmptyStateSubtitle = 'Ask anything — analyze, generate, reason.';
   static const List<String> chatSuggestions = [
@@ -44,7 +45,7 @@ class AppStrings {
 
   // Auth Screen
   static const String loginTitle = 'Welcome back';
-  static const String loginSubtitle = 'Sign in to your Zenith account';
+  static const String loginSubtitle = 'Sign in to your ${AppConfig.appName} account';
   static const String orContinueWithEmail = 'or continue with email';
   static const String emailLabel = 'Email';
   static const String passwordLabel = 'Password';
@@ -54,7 +55,7 @@ class AppStrings {
   static const String signUpFree = 'Sign up free';
   static const String alreadyHaveAccount = 'Already have an account? ';
   static const String signUpTitle = 'Create account';
-  static const String signUpSubtitle = 'Join Zenith AI to scale your ambition';
+  static const String signUpSubtitle = 'Join ${AppConfig.appName} to scale your ambition';
   static const String fullNameLabel = 'Full Name';
 
   // Dashboard Screen

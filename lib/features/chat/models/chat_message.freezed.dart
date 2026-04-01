@@ -243,6 +243,8 @@ mixin _$ChatState {
   String get streamingText => throw _privateConstructorUsedError;
   bool get hasStreamingError => throw _privateConstructorUsedError;
   String? get lastPrompt => throw _privateConstructorUsedError;
+  bool get showPaywall => throw _privateConstructorUsedError;
+  String get paywallMessage => throw _privateConstructorUsedError;
 
   /// Serializes this ChatState to a JSON map.
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
@@ -266,6 +268,8 @@ abstract class $ChatStateCopyWith<$Res> {
     String streamingText,
     bool hasStreamingError,
     String? lastPrompt,
+    bool showPaywall,
+    String paywallMessage,
   });
 }
 
@@ -290,6 +294,8 @@ class _$ChatStateCopyWithImpl<$Res, $Val extends ChatState>
     Object? streamingText = null,
     Object? hasStreamingError = null,
     Object? lastPrompt = freezed,
+    Object? showPaywall = null,
+    Object? paywallMessage = null,
   }) {
     return _then(
       _value.copyWith(
@@ -317,6 +323,14 @@ class _$ChatStateCopyWithImpl<$Res, $Val extends ChatState>
                 ? _value.lastPrompt
                 : lastPrompt // ignore: cast_nullable_to_non_nullable
                       as String?,
+            showPaywall: null == showPaywall
+                ? _value.showPaywall
+                : showPaywall // ignore: cast_nullable_to_non_nullable
+                      as bool,
+            paywallMessage: null == paywallMessage
+                ? _value.paywallMessage
+                : paywallMessage // ignore: cast_nullable_to_non_nullable
+                      as String,
           )
           as $Val,
     );
@@ -339,6 +353,8 @@ abstract class _$$ChatStateImplCopyWith<$Res>
     String streamingText,
     bool hasStreamingError,
     String? lastPrompt,
+    bool showPaywall,
+    String paywallMessage,
   });
 }
 
@@ -362,6 +378,8 @@ class __$$ChatStateImplCopyWithImpl<$Res>
     Object? streamingText = null,
     Object? hasStreamingError = null,
     Object? lastPrompt = freezed,
+    Object? showPaywall = null,
+    Object? paywallMessage = null,
   }) {
     return _then(
       _$ChatStateImpl(
@@ -389,6 +407,14 @@ class __$$ChatStateImplCopyWithImpl<$Res>
             ? _value.lastPrompt
             : lastPrompt // ignore: cast_nullable_to_non_nullable
                   as String?,
+        showPaywall: null == showPaywall
+            ? _value.showPaywall
+            : showPaywall // ignore: cast_nullable_to_non_nullable
+                  as bool,
+        paywallMessage: null == paywallMessage
+            ? _value.paywallMessage
+            : paywallMessage // ignore: cast_nullable_to_non_nullable
+                  as String,
       ),
     );
   }
@@ -404,6 +430,8 @@ class _$ChatStateImpl implements _ChatState {
     this.streamingText = '',
     this.hasStreamingError = false,
     this.lastPrompt,
+    this.showPaywall = false,
+    this.paywallMessage = '',
   }) : _messages = messages;
 
   factory _$ChatStateImpl.fromJson(Map<String, dynamic> json) =>
@@ -432,10 +460,16 @@ class _$ChatStateImpl implements _ChatState {
   final bool hasStreamingError;
   @override
   final String? lastPrompt;
+  @override
+  @JsonKey()
+  final bool showPaywall;
+  @override
+  @JsonKey()
+  final String paywallMessage;
 
   @override
   String toString() {
-    return 'ChatState(messages: $messages, isTyping: $isTyping, selectedModel: $selectedModel, streamingText: $streamingText, hasStreamingError: $hasStreamingError, lastPrompt: $lastPrompt)';
+    return 'ChatState(messages: $messages, isTyping: $isTyping, selectedModel: $selectedModel, streamingText: $streamingText, hasStreamingError: $hasStreamingError, lastPrompt: $lastPrompt, showPaywall: $showPaywall, paywallMessage: $paywallMessage)';
   }
 
   @override
@@ -453,7 +487,11 @@ class _$ChatStateImpl implements _ChatState {
             (identical(other.hasStreamingError, hasStreamingError) ||
                 other.hasStreamingError == hasStreamingError) &&
             (identical(other.lastPrompt, lastPrompt) ||
-                other.lastPrompt == lastPrompt));
+                other.lastPrompt == lastPrompt) &&
+            (identical(other.showPaywall, showPaywall) ||
+                other.showPaywall == showPaywall) &&
+            (identical(other.paywallMessage, paywallMessage) ||
+                other.paywallMessage == paywallMessage));
   }
 
   @JsonKey(includeFromJson: false, includeToJson: false)
@@ -466,6 +504,8 @@ class _$ChatStateImpl implements _ChatState {
     streamingText,
     hasStreamingError,
     lastPrompt,
+    showPaywall,
+    paywallMessage,
   );
 
   /// Create a copy of ChatState
@@ -490,6 +530,8 @@ abstract class _ChatState implements ChatState {
     final String streamingText,
     final bool hasStreamingError,
     final String? lastPrompt,
+    final bool showPaywall,
+    final String paywallMessage,
   }) = _$ChatStateImpl;
 
   factory _ChatState.fromJson(Map<String, dynamic> json) =
@@ -507,6 +549,10 @@ abstract class _ChatState implements ChatState {
   bool get hasStreamingError;
   @override
   String? get lastPrompt;
+  @override
+  bool get showPaywall;
+  @override
+  String get paywallMessage;
 
   /// Create a copy of ChatState
   /// with the given fields replaced by the non-null parameter values.

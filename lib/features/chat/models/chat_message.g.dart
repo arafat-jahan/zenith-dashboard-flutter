@@ -34,6 +34,8 @@ _$ChatStateImpl _$$ChatStateImplFromJson(Map<String, dynamic> json) =>
       streamingText: json['streamingText'] as String? ?? '',
       hasStreamingError: json['hasStreamingError'] as bool? ?? false,
       lastPrompt: json['lastPrompt'] as String?,
+      showPaywall: json['showPaywall'] as bool? ?? false,
+      paywallMessage: json['paywallMessage'] as String? ?? '',
     );
 
 Map<String, dynamic> _$$ChatStateImplToJson(_$ChatStateImpl instance) =>
@@ -44,4 +46,6 @@ Map<String, dynamic> _$$ChatStateImplToJson(_$ChatStateImpl instance) =>
       'streamingText': instance.streamingText,
       'hasStreamingError': instance.hasStreamingError,
       'lastPrompt': instance.lastPrompt,
+      'showPaywall': instance.showPaywall,
+      'paywallMessage': instance.paywallMessage,
     };

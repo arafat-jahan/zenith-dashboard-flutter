@@ -4,6 +4,7 @@ import 'package:lucide_icons/lucide_icons.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_text_styles.dart';
 import '../../../core/constants/app_strings.dart';
+import '../../../core/config/app_config.dart';
 import '../../../shared/widgets/glass_card.dart';
 import '../../../shared/widgets/gradient_badge.dart';
 
@@ -60,7 +61,7 @@ class _BrandingPanelState extends State<BrandingPanel> with SingleTickerProvider
           child: const Icon(LucideIcons.zap, color: Colors.white, size: 18),
         ),
         const SizedBox(width: 12),
-        Text('Zenith AI', style: AppTextStyles.headlineLarge),
+        Text(AppConfig.appName, style: AppTextStyles.headlineLarge),
       ]);
     }
 

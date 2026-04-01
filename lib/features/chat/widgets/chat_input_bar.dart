@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_text_styles.dart';
+import '../../../core/config/app_config.dart';
 import '../../../shared/widgets/glass_card.dart';
 
 class ChatInputBar extends StatelessWidget {
@@ -38,7 +39,7 @@ class ChatInputBar extends StatelessWidget {
               style: AppTextStyles.bodyMedium.copyWith(color: AppColors.textPrimary),
               maxLines: 4, minLines: 1,
               decoration: InputDecoration(
-                hintText: 'Message Zenith AI…',
+                hintText: 'Message ${AppConfig.appName}…',
                 hintStyle: AppTextStyles.bodyMedium,
                 border: InputBorder.none,
                 contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 13),

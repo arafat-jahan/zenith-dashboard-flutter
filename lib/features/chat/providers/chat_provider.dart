@@ -1,19 +1,13 @@
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_core/firebase_core.dart';
 import '../../../core/repositories/implementations/gemini_chat_repository.dart';
-import '../../../core/repositories/implementations/mock_chat_repository.dart';
 import '../../../core/repositories/interfaces/i_chat_repository.dart';
 import '../../auth/providers/auth_provider.dart';
 import '../models/chat_message.dart';
-import '../../../core/providers/app_state_provider.dart'; // Fixed import to avoid circular dependency
 
 final chatRepositoryProvider = Provider<IChatRepository>((ref) {
-  final isMock = ref.watch(isMockModeProvider);
-  if (isMock || Firebase.apps.isEmpty) {
-    return MockChatRepository();
-  }
+  // Force Firebase usage - no more mock mode
   return GeminiChatRepository(FirebaseFirestore.instance);
 });
 
@@ -27,6 +21,16 @@ class ChatNotifier extends Notifier<ChatState> {
   Future<void> sendMessage(String text) async {
     final sanitizedText = text.trim();
     if (sanitizedText.isEmpty) return;
+
+    // Check credits before allowing chat
+    final userModel = await ref.read(userProfileProvider.future);
+    if (userModel != null && userModel.credits <= 0) {
+      state = state.copyWith(
+        showPaywall: true,
+        paywallMessage: 'You have run out of credits. Buy more credits to continue chatting!',
+      );
+      return;
+    }
 
     final userMessage = ChatMessage(
       text: sanitizedText,
@@ -64,6 +68,15 @@ class ChatNotifier extends Notifier<ChatState> {
       final userModel = await ref.read(userProfileProvider.future);
 
       if (userModel != null) {
+        // Check credits again before streaming
+        if (userModel.credits <= 0) {
+          state = state.copyWith(
+            showPaywall: true,
+            paywallMessage: 'You have run out of credits. Buy more credits to continue chatting!',
+          );
+          return;
+        }
+
         final stream = chatRepo.generateResponseStream(userModel, prompt, modelName: state.selectedModel);
 
         String accumulated = '';
@@ -83,7 +96,10 @@ class ChatNotifier extends Notifier<ChatState> {
           );
         }
 
-        if (state.streamingText.isNotEmpty) {
+        // Only decrement credits after successful response
+        if (state.streamingText.isNotEmpty && !state.streamingText.startsWith('Error:')) {
+          await _decrementCredits(userModel.id);
+          
           final aiMessage = ChatMessage(
             text: state.streamingText,
             isUser: false,
@@ -102,11 +118,30 @@ class ChatNotifier extends Notifier<ChatState> {
     }
   }
 
+  Future<void> _decrementCredits(String userId) async {
+    try {
+      await FirebaseFirestore.instance
+          .collection('users')
+          .doc(userId)
+          .update({'credits': FieldValue.increment(-1)});
+    } catch (e) {
+      // Log error but don't block user experience
+      print('Failed to decrement credits: $e');
+    }
+  }
+
   void _addErrorMessage(String error) {
     state = state.copyWith(
       isTyping: false,
       streamingText: error,
       hasStreamingError: true,
+    );
+  }
+
+  void dismissPaywall() {
+    state = state.copyWith(
+      showPaywall: false,
+      paywallMessage: '',
     );
   }
 
@@ -116,6 +151,12 @@ class ChatNotifier extends Notifier<ChatState> {
 
   void clearChat() {
     state = const ChatState(); // Complete reset
+  }
+
+  // Get current user credits for UI display
+  Future<int?> getUserCredits() async {
+    final userModel = await ref.read(userProfileProvider.future);
+    return userModel?.credits;
   }
 }
 

@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 import 'package:responsive_framework/responsive_framework.dart';
+import 'package:url_launcher/url_launcher.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_text_styles.dart';
 import '../../../core/models/pricing_plan.dart';
@@ -174,9 +175,15 @@ class _PricingCard extends ConsumerWidget {
                 child: InkWell(
                   onTap: isLoading
                       ? null
-                      : () => ref
-                      .read(subscriptionProvider.notifier)
-                      .requestSubscription(plan.id),
+                      : () async {
+                          final url = 'https://buy.stripe.com/test_00w28q78R6qJ9xt7rn4Rq00';
+                          await launchUrl(
+                            Uri.parse(url),
+                            mode: LaunchMode.externalApplication,
+                          );
+                          // Navigate to manual verification screen
+                          Navigator.of(context).pushNamed('/success-manual');
+                        },
                   borderRadius: BorderRadius.circular(12),
                   child: Padding(
                     padding: const EdgeInsets.symmetric(vertical: 16),

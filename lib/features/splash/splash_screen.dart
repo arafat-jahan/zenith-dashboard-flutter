@@ -6,7 +6,6 @@ import '../../core/theme/app_colors.dart';
 import '../auth/providers/auth_provider.dart';
 import '../auth/screens/login_screen.dart';
 import '../../app_shell.dart';
-import '../../core/providers/app_state_provider.dart'; // Fixed import to avoid circular dependency
 
 class SplashScreen extends ConsumerStatefulWidget {
   const SplashScreen({super.key});

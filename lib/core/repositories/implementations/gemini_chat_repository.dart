@@ -1,9 +1,10 @@
 import 'dart:async';
+import 'package:flutter/foundation.dart';
 import 'package:google_generative_ai/google_generative_ai.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:flutter/foundation.dart';
 import '../../models/user_model.dart';
 import '../interfaces/i_chat_repository.dart';
+import '../../../core/config/app_config.dart';
 
 class GeminiChatRepository implements IChatRepository {
   final FirebaseFirestore _db;
@@ -35,7 +36,7 @@ class GeminiChatRepository implements IChatRepository {
 
     if (_geminiApiKey.isEmpty) {
       // PRO-LEVEL MOCK MODE: Show the typewriter animation even without a key
-      yield 'Hello! I am Zenith AI. Currently, I am running in **Demo Mode** because no API Key was found.';
+      yield 'Hello! I am ${AppConfig.appName}. Currently, I am running in **Demo Mode** because no API Key was found.';
       await Future.delayed(const Duration(milliseconds: 800));
       yield '\n\nYou can still test my UI and see how the **Typewriter Streaming** animation feels.';
       await Future.delayed(const Duration(milliseconds: 600));

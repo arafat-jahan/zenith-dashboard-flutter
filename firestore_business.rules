@@ -1,0 +1,113 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Users collection - users can only read/write their own profile
+    // But they CANNOT modify their own credits, role, or plan fields
+    match /users/{userId} {
+      // Read access: users can read their own profile, admins can read all
+      allow read: if request.auth != null && 
+        (request.auth.uid == userId || 
+         get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'admin');
+      
+      // Create access: users can create their own profile with restricted fields
+      allow create: if request.auth != null && 
+        request.auth.uid == userId &&
+        request.resource.data.keys().hasAll(['email', 'name', 'plan', 'tokenUsage', 'credits', 'role']) &&
+        request.resource.data.credits == 5 &&  // Default credits
+        request.resource.data.role == 'user' && // Default role
+        request.resource.data.plan == 'free';   // Default plan
+      
+      // Update access: users can only update specific fields, admins can update all
+      allow update: if request.auth != null && 
+        (request.auth.uid == userId || 
+         get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'admin') &&
+        // Regular users cannot update credits, role, or plan
+        (request.auth.uid == userId ? 
+          (!request.resource.data.keys().hasAny(['credits', 'role', 'plan']) || 
+           request.resource.data.credits == resource.data.credits &&
+           request.resource.data.role == resource.data.role &&
+           request.resource.data.plan == resource.data.plan) : 
+         true); // Admins can update everything
+      
+      // Delete access: only admins can delete users
+      allow delete: if request.auth != null && 
+        get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'admin';
+    }
+    
+    // Chats collection - users can only read their own chats
+    match /chats/{chatId} {
+      allow read: if request.auth != null && 
+        request.auth.uid in resource.data.ownerIds;
+      allow create: if request.auth != null && 
+        request.auth.uid in request.resource.data.ownerIds &&
+        request.resource.data.keys().hasAll(['ownerIds', 'createdAt', 'updatedAt']);
+      allow update: if request.auth != null && 
+        request.auth.uid in resource.data.ownerIds;
+      allow delete: if request.auth != null && 
+        request.auth.uid in resource.data.ownerIds;
+    }
+    
+    // Messages collection - nested under chats
+    match /chats/{chatId}/messages/{messageId} {
+      allow read: if request.auth != null && 
+        request.auth.uid in get(/databases/$(database)/documents/chats/$(chatId)).data.ownerIds;
+      allow create: if request.auth != null && 
+        request.auth.uid in get(/databases/$(database)/documents/chats/$(chatId)).data.ownerIds &&
+        request.resource.data.keys().hasAll(['text', 'isUser', 'timestamp', 'chatId']);
+      allow update: if request.auth != null && 
+        request.auth.uid == resource.data.userId; // Only message author can update
+      allow delete: if request.auth != null && 
+        request.auth.uid == resource.data.userId; // Only message author can delete
+    }
+    
+    // Credits/Usage collection - users can only read their own usage data
+    match /usage/{userId} {
+      allow read, write: if request.auth != null && request.auth.uid == userId;
+      allow create: if request.auth != null && request.auth.uid == userId;
+    }
+    
+    // Subscriptions collection - users can only read their own subscriptions
+    match /subscriptions/{userId} {
+      allow read: if request.auth != null && request.auth.uid == userId;
+      allow create: if request.auth != null && request.auth.uid == userId;
+      allow update: if request.auth != null && 
+        (request.auth.uid == userId || 
+         get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'admin');
+    }
+    
+    // Stripe customer data - users can only read their own customer info
+    match /stripe_customers/{userId} {
+      allow read: if request.auth != null && request.auth.uid == userId;
+      allow create: if request.auth != null && request.auth.uid == userId;
+      allow update: if request.auth != null && 
+        (request.auth.uid == userId || 
+         get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'admin');
+    }
+    
+    // Payment history - users can only read their own payment history
+    match /payments/{userId} {
+      allow read: if request.auth != null && request.auth.uid == userId;
+      allow write: if request.auth != null && 
+        (request.auth.uid == userId || 
+         get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'admin');
+      allow create: if request.auth != null && request.auth.uid == userId;
+    }
+    
+    // Admin logs - only admins can access
+    match /admin_logs/{logId} {
+      allow read, write, create: if request.auth != null && 
+        get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'admin';
+    }
+    
+    // System configuration - only admins can access
+    match /system_config/{configId} {
+      allow read, write, update, delete: if request.auth != null && 
+        get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'admin';
+    }
+    
+    // Deny all other reads/writes
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}

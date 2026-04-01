@@ -25,6 +25,8 @@ class ChatState with _$ChatState {
     @Default('') String streamingText,
     @Default(false) bool hasStreamingError,
     String? lastPrompt,
+    @Default(false) bool showPaywall,
+    @Default('') String paywallMessage,
   }) = _ChatState;
 
   factory ChatState.fromJson(Map<String, dynamic> json) => _$ChatStateFromJson(json);
